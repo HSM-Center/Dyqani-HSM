@@ -1029,7 +1029,55 @@ select option{background:#fff}
 
 </div><!-- END APP WRAPPER -->
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+// ── SUPABASE ──────────────────────────────────────────────────────────
+const SUPA_URL = 'https://sfcabrvvnvbnccbwnfvi.supabase.co';
+const SUPA_KEY = 'sb_publishable_aI6cQDd_9bjXfQ4HRwbiZw_POPTOZlV';
+const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+async function sbLoad(){
+  try {
+    const [u,p,bl,sh,shp,fm,cfg] = await Promise.all([
+      sb.from('users').select('*'),
+      sb.from('products').select('*'),
+      sb.from('blerjet').select('*'),
+      sb.from('shitjet').select('*'),
+      sb.from('shpenzimet').select('*'),
+      sb.from('faturat_meta').select('*'),
+      sb.from('biz_cfg').select('*').eq('id',1).single()
+    ]);
+    if(u.data?.length) users = u.data;
+    if(p.data?.length) products = p.data;
+    if(bl.data?.length) blerjet = bl.data.map(b=>({...b,cmb:Number(b.cmb),sasia:Number(b.sasia)}));
+    if(sh.data?.length) shitjet = sh.data.map(s=>({...s,cms:Number(s.cms),sasia:Number(s.sasia),borxh:Number(s.borxh||0)}));
+    if(shp.data?.length) shpenzimet = shp.data.map(s=>({...s,vlera:Number(s.vlera)}));
+    if(fm.data?.length){
+      faturatMeta={};
+      fm.data.forEach(f=>faturatMeta[f.fat]={status:f.status,paguar:Number(f.paguar),borxh:Number(f.borxh)});
+    }
+    if(cfg.data) {
+      bizCfg={emri:cfg.data.emri||'',nipt:cfg.data.nipt||'',tel:cfg.data.tel||'',adresa:cfg.data.adresa||'',footer:cfg.data.footer||'',prefSh:cfg.data.pref_sh||'F',prefBl:cfg.data.pref_bl||'BL',pad:cfg.data.pad||4};
+    }
+    console.log('✓ Supabase: të dhënat u ngarkuan');
+  } catch(e){ console.warn('⚠ Supabase load error:', e); }
+}
+
+async function sbSave(){
+  try {
+    await Promise.all([
+      sb.from('products').upsert(products),
+      sb.from('blerjet').upsert(blerjet),
+      sb.from('shitjet').upsert(shitjet),
+      sb.from('shpenzimet').upsert(shpenzimet),
+      sb.from('users').upsert(users),
+      sb.from('biz_cfg').upsert({id:1,emri:bizCfg.emri,nipt:bizCfg.nipt,tel:bizCfg.tel,adresa:bizCfg.adresa,footer:bizCfg.footer,pref_sh:bizCfg.prefSh,pref_bl:bizCfg.prefBl,pad:bizCfg.pad}),
+      ...Object.entries(faturatMeta).map(([fat,v])=>sb.from('faturat_meta').upsert({fat,status:v.status,paguar:v.paguar||0,borxh:v.borxh||0}))
+    ]);
+    console.log('✓ Supabase: të dhënat u ruajtën');
+  } catch(e){ console.warn('⚠ Supabase save error:', e); }
+}
+
 // ── SIDEBAR TOGGLE ────────────────────────────────────────────────────
 function toggleSidebar(){
   const sb=document.getElementById('sidebar');
@@ -1370,6 +1418,7 @@ function save(){
   localStorage.setItem('tp_shpenzimet',JSON.stringify(shpenzimet));
   localStorage.setItem('tp_faturat_meta',JSON.stringify(faturatMeta));
   localStorage.setItem('tp_users',JSON.stringify(users));
+  sbSave(); // ruaj edhe në Supabase
 }
 
 // ── UTILS ──────────────────────────────────────────────────────────────
@@ -3148,7 +3197,26 @@ fetchExchangeRate();
 updateClock();
 setInterval(updateClock,1000);
 initDraggableModals();
-applyBizCfg(); // Zbato emrin e biznesit menjëherë
+applyBizCfg();
+
+// Ngarko nga Supabase para se të shfaqet login
+(async()=>{
+  const loginScreen=document.getElementById('login-screen');
+  const loader=document.createElement('div');
+  loader.style.cssText='position:fixed;inset:0;z-index:99999;background:linear-gradient(135deg,#0f1117,#1a1d2e);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem';
+  loader.innerHTML=`<div style="width:52px;height:52px;background:linear-gradient(135deg,#4f6ef7,#7c5cfc);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:26px">💻</div>
+    <div style="color:#fff;font-size:15px;font-weight:700">Duke u lidhur me bazën e të dhënave...</div>
+    <div style="width:200px;height:4px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden">
+      <div style="height:100%;background:linear-gradient(90deg,#4f6ef7,#7c5cfc);animation:loadBar 1.5s ease-in-out infinite;width:60%" id="load-bar"></div>
+    </div>`;
+  const style=document.createElement('style');
+  style.textContent='@keyframes loadBar{0%{transform:translateX(-100%)}100%{transform:translateX(200%)}}';
+  document.head.appendChild(style);
+  document.body.appendChild(loader);
+  await sbLoad();
+  applyBizCfg();
+  loader.remove();
+})();
 // renderAll() dhe autoBackupCheck() thirren pas login-it
 </script>
 </body>
