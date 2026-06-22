@@ -249,10 +249,6 @@ select option{background:#fff}
 .taskbar-pill:hover{filter:brightness(1.1)}
 .taskbar-pill .pill-x{opacity:.75;font-weight:800}
 .taskbar-pill .pill-x:hover{opacity:1}
-.kli-dropdown{display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1.5px solid var(--accent);border-radius:9px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:500;max-height:200px;overflow-y:auto;margin-top:2px}
-.kli-item{padding:9px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid #f3f4f6;transition:background .1s}
-.kli-item:hover{background:#f0f7ff;color:var(--accent);font-weight:600}
-.kli-item:last-child{border-bottom:none}
 @media (max-width:768px){
   .modal-overlay.open{background:rgba(0,0,0,.55)!important;pointer-events:auto}
   .modal-box{position:relative;top:auto;left:auto;right:auto;transform:none;resize:none;width:100%!important;max-width:100%}
@@ -518,6 +514,8 @@ select option{background:#fff}
   <button class="nav-btn" id="nav-users" onclick="goTab(9,this)" data-tip="Përdoruesit" style="display:none"><span class="nav-icon">👥</span><span class="nav-label">Përdoruesit</span></button>
   <button class="nav-btn" id="nav-cfg" onclick="goTab(10,this)" data-tip="Konfigurimet" style="display:none"><span class="nav-icon">⚙️</span><span class="nav-label">Konfigurimet</span></button>
   <button class="nav-btn" onclick="doBackup()" data-tip="Backup" style="margin-top:4px"><span class="nav-icon">💾</span><span class="nav-label">Backup Tani</span></button>
+  <button class="nav-btn" onclick="document.getElementById('file-restore').click()" data-tip="Rikthe nga Backup"><span class="nav-icon">📥</span><span class="nav-label">Rikthe Backup</span></button>
+  <input type="file" id="file-restore" accept=".json" style="display:none" onchange="handleRestoreFile(this)">
   <div class="sidebar-footer"><span id="sf-bizname">Sistemi</span> v3.0 · <span id="sf-date"></span></div>
 </nav>
 
@@ -573,8 +571,8 @@ select option{background:#fff}
         <div class="form-grid dash-form-grid" style="grid-template-columns:1fr 1fr 1fr">
           <div class="form-group"><label>Nr. Faturës *</label><div style="display:flex;gap:6px;align-items:center"><input id="ds-fat" placeholder="F-SH-001" style="flex:1"><button type="button" onclick="document.getElementById('ds-fat').value=nextFatNr('sh')" title="Gjenero automatikisht" style="background:linear-gradient(135deg,#4f6ef7,#7c5cfc);border:none;color:#fff;border-radius:8px;padding:0 10px;font-size:16px;cursor:pointer;height:40px;flex-shrink:0">🔄</button></div></div>
           <div class="form-group"><label>Data *</label><input id="ds-data" type="date"></div>
-          <div class="form-group" style="position:relative"><label>Klienti *</label><input id="ds-kli" placeholder="Emri klientit" autocomplete="off" oninput="kliSearchInput(this.value, 'ds-kli-dropdown', 'ds-kli')" onfocus="kliSearchInput(this.value, 'ds-kli-dropdown', 'ds-kli')"><div id="ds-kli-dropdown" class="kli-dropdown"></div></div>
-          <div class="form-group"><label>Mënyra Pagesës</label><select id="ds-pag" onchange="dsTogglePjeserisht()"><option>Cash</option><option>Debitor</option><option>Pjesërisht</option><option>Preventiv</option></select></div>
+          <div class="form-group"><label>Klienti *</label><input id="ds-kli" placeholder="Emri klientit"></div>
+          <div class="form-group"><label>Mënyra Pagesës</label><select id="ds-pag" onchange="dsTogglePjeserisht()"><option>Cash</option><option>Servis</option><option>Debitor</option><option>Pjesërisht</option><option>Preventiv</option></select></div>
           <div class="form-group"><label>Valuta</label><select id="ds-curr" onchange="dsUpdateLabels()"><option value="ALL">Lekë (L)</option><option value="EUR">Euro (€)</option></select></div>
           <div class="form-group"><label>TVSH (20%)</label><select id="ds-tvsh-opt" onchange="dsRenderCart()"><option value="po">Po</option><option value="jo">Jo</option></select></div>
         </div>
@@ -600,7 +598,7 @@ select option{background:#fff}
               <div style="display:flex;gap:4px">
                 <input id="ds-sasia" type="number" placeholder="1" min="0.01" step="0.01" value="1" style="width:70px;flex-shrink:0" onkeydown="if(event.key==='Enter')document.getElementById('ds-cms').focus()">
                 <select id="ds-nje" style="flex:1;background:#fff;border:1.5px solid var(--border);border-radius:9px;padding:9px 8px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text);outline:none">
-                  <option>Cope</option><option>Kutia</option><option>Pakete</option><option>Set</option><option>License</option><option>Meter</option><option>Gram</option>
+                  <option>Cope</option><option>Metër</option><option>Kuti</option><option>Set</option><option>Paketë</option><option>Licencë</option>
                 </select>
               </div>
             </div>
@@ -749,7 +747,7 @@ select option{background:#fff}
 
     <div class="page" id="tab-3">
       <div class="btn-row">
-        <button class="btn btn-primary" onclick="openShitjeModal()">+ Regjistro Shitje</button>
+        <button class="btn btn-primary" onclick="openModal('modal-addshitje')">+ Regjistro Shitje</button>
         <div class="search-box" style="flex:1;max-width:340px">
           <span style="color:var(--text3)">🔍</span>
           <input id="shitje-search" placeholder="Kërko klient, faturë, datë..." oninput="shitjetPage=1;renderShitjet()">
@@ -776,8 +774,6 @@ select option{background:#fff}
           <button class="btn btn-outline btn-sm" onclick="exportArkivExcel()">⬇ Excel</button>
           <button class="btn btn-outline btn-sm" onclick="fatResetFilters()">↺ Pastro Filtrat</button>
           <button id="btn-fshi-te-gjitha-faturat" class="btn btn-danger btn-sm" onclick="fshiTeGjithaFaturatAdmin()" style="display:none">🗑 Fshi të Gjitha</button>
-          <button id="btn-restauro-arkiv" class="btn btn-outline btn-sm" onclick="document.getElementById('input-restauro-arkiv').click()" style="display:none">⬆ Rivendos nga Arkivi</button>
-          <input type="file" id="input-restauro-arkiv" accept="application/json" style="display:none" onchange="importoArkivinFaturave(this)">
         </div>
 
         <!-- Search input full width -->
@@ -1064,7 +1060,7 @@ select option{background:#fff}
     </div>
 </div>
 
-<div class="modal-overlay" id="modal-edituser" >
+<div class="modal-overlay" id="modal-edituser" onclick="closeModal(event,'modal-edituser')">
   <div class="modal-box">
     <div class="modal-header">
       <div class="modal-title">✏️ Ndrysho Përdoruesin</div>
@@ -1106,7 +1102,7 @@ select option{background:#fff}
 
 <div id="window-taskbar"></div>
 
-<div class="modal-overlay" id="modal-adduser" >
+<div class="modal-overlay" id="modal-adduser" onclick="closeModal(event,'modal-adduser')">
   <div class="modal-box">
     <div class="modal-header"><div class="modal-title">👥 Shto Përdorues të Ri</div><div style="display:flex;gap:8px;align-items:center"><button class="modal-close" title="Maksimizo" onclick="toggleMaximize('modal-adduser',this)">□</button><button class="modal-close" title="Minimizo" onclick="minimizeModal('modal-adduser','👥 Shto Përdorues')">—</button><button class="modal-close" onclick="closeModalById('modal-adduser')">×</button></div></div>
     <div class="form-grid">
@@ -1128,14 +1124,14 @@ select option{background:#fff}
   </div>
 </div>
 
-<div class="modal-overlay" id="modal-addprod" >
+<div class="modal-overlay" id="modal-addprod" onclick="closeModal(event,'modal-addprod')">
   <div class="modal-box">
     <div class="modal-header"><div class="modal-title">➕ Shto Produkt të Ri</div><div style="display:flex;gap:8px;align-items:center"><button class="modal-close" title="Maksimizo" onclick="toggleMaximize('modal-addprod',this)">□</button><button class="modal-close" title="Minimizo" onclick="minimizeModal('modal-addprod','➕ Shto Produkt')">—</button><button class="modal-close" onclick="closeModalById('modal-addprod')">×</button></div></div>
     <div class="form-grid">
       <div class="form-group"><label>Kodi *</label><input id="p-id" placeholder="P001"></div>
       <div class="form-group"><label>Emri *</label><input id="p-name" placeholder="Emri i produktit"></div>
       <div class="form-group"><label>Kategoria</label><input id="p-kat" placeholder="Pije, Ushqim..."></div>
-      <div class="form-group"><label>Njësia</label><select id="p-nje"><option>Cope</option><option>Kutia</option><option>Pakete</option><option>Set</option><option>License</option><option>Meter</option><option>Gram</option></select></div>
+      <div class="form-group"><label>Njësia</label><select id="p-nje"><option>Cope</option><option>Kuti</option><option>Set</option><option>Metër</option><option>Paketë</option><option>Licencë</option></select></div>
       <div class="form-group"><label>Çmimi Blerjes (L) *</label><input id="p-cmb" type="number" placeholder="0"></div>
       <div class="form-group"><label>Çmimi Shitjes 1 (L) *</label><input id="p-cms" type="number" placeholder="0"></div>
       <div class="form-group"><label>Çmimi Shitjes 2 (L)</label><input id="p-cms2" type="number" placeholder="(opsionale)"></div>
@@ -1150,7 +1146,7 @@ select option{background:#fff}
   </div>
 </div>
 
-<div class="modal-overlay" id="modal-addblerje" >
+<div class="modal-overlay" id="modal-addblerje" onclick="closeModal(event,'modal-addblerje')">
   <div class="modal-box" style="width:900px;max-width:98vw;max-height:95vh;overflow-y:auto;display:flex;flex-direction:column">
     <div class="modal-header" style="flex-shrink:0"><div class="modal-title">⬇ Regjistro Blerje</div><div style="display:flex;gap:8px;align-items:center"><button class="modal-close" title="Maksimizo" onclick="toggleMaximize('modal-addblerje',this)">□</button><button class="modal-close" title="Minimizo" onclick="minimizeModal('modal-addblerje','⬇ Blerje')">—</button><button class="modal-close" onclick="closeModalById('modal-addblerje')">×</button></div></div>
     <div style="flex:1;overflow-y:auto;padding-bottom:.5rem">
@@ -1160,7 +1156,6 @@ select option{background:#fff}
       <div class="form-group"><label>Furnitori *</label><input id="b-furn" placeholder="Emri furnitorit"></div>
       <div class="form-group"><label>Valuta</label><select id="b-curr" onchange="updateBlerjeLabels()"><option value="ALL">Lekë (L)</option><option value="EUR">Euro (€)</option></select></div>
       <div class="form-group"><label>TVSH (20%)</label><select id="b-tvsh-opt" onchange="renderBlerjeCart()"><option value="jo">Jo</option><option value="po">Po</option></select></div>
-      <div class="form-group"><label>Mënyra Pagesës</label><select id="b-pag"><option value="Cash">Cash</option><option value="Debitor">Debitor</option></select></div>
     </div>
     <div style="background:#f8fafc;border-radius:10px;padding:1rem;margin-bottom:1rem;border:1px solid var(--border)">
       <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text2);margin-bottom:.75rem">➕ Shto Artikull</div>
@@ -1176,7 +1171,7 @@ select option{background:#fff}
           <div style="display:flex;gap:4px">
             <input id="b-sasia" type="number" placeholder="1" min="0.01" step="0.01" value="1" style="width:70px;flex-shrink:0" onkeydown="if(event.key==='Enter')document.getElementById('b-cmb').focus()">
             <select id="b-nje" style="flex:1;background:#fff;border:1.5px solid var(--border);border-radius:9px;padding:9px 8px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text);outline:none;transition:border-color .15s" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
-              <option>Cope</option><option>Kutia</option><option>Pakete</option><option>Set</option><option>License</option><option>Meter</option><option>Gram</option>
+              <option>Cope</option><option>Metër</option><option>Kuti</option><option>Set</option><option>Paketë</option><option>Licencë</option>
             </select>
           </div>
         </div>
@@ -1210,8 +1205,8 @@ select option{background:#fff}
     <div class="form-grid" style="grid-template-columns:1fr 1fr 1fr">
       <div class="form-group"><label>Nr. Faturës *</label><div style="display:flex;gap:6px;align-items:center"><input id="s-fat" placeholder="F-SH-001" style="flex:1"><button type="button" onclick="document.getElementById('s-fat').value=nextFatNr('sh')" title="Gjenero automatikisht" style="background:linear-gradient(135deg,#4f6ef7,#7c5cfc);border:none;color:#fff;border-radius:8px;padding:0 10px;font-size:16px;cursor:pointer;height:40px;flex-shrink:0">🔄</button></div></div>
       <div class="form-group"><label>Data *</label><input id="s-data" type="date"></div>
-      <div class="form-group" style="position:relative"><label>Klienti *</label><input id="s-kli" placeholder="Emri klientit" autocomplete="off" oninput="kliSearchInput(this.value, 's-kli-dropdown', 's-kli')" onfocus="kliSearchInput(this.value, 's-kli-dropdown', 's-kli')"><div id="s-kli-dropdown" class="kli-dropdown"></div></div>
-      <div class="form-group"><label>Mënyra Pagesës</label><select id="s-pag" onchange="togglePjesërisht()"><option>Cash</option><option>Debitor</option><option>Pjesërisht</option><option>Preventiv</option></select></div>
+      <div class="form-group"><label>Klienti *</label><input id="s-kli" placeholder="Emri klientit"></div>
+      <div class="form-group"><label>Mënyra Pagesës</label><select id="s-pag" onchange="togglePjesërisht()"><option>Cash</option><option>Servis</option><option>Debitor</option><option>Pjesërisht</option><option>Preventiv</option></select></div>
       <div class="form-group"><label>Valuta</label><select id="s-curr" onchange="updateShitjeLabels()"><option value="ALL">Lekë (L)</option><option value="EUR">Euro (€)</option></select></div>
       <div class="form-group"><label>TVSH (20%)</label><select id="s-tvsh-opt" onchange="renderCart()"><option value="po">Po</option><option value="jo">Jo</option></select></div>
     </div>
@@ -1237,7 +1232,7 @@ select option{background:#fff}
           <div style="display:flex;gap:4px">
             <input id="s-sasia" type="number" placeholder="1" min="0.01" step="0.01" value="1" style="width:70px;flex-shrink:0" onkeydown="if(event.key==='Enter')document.getElementById('s-cms').focus()">
             <select id="s-nje" style="flex:1;background:#fff;border:1.5px solid var(--border);border-radius:9px;padding:9px 8px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text);outline:none;transition:border-color .15s" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
-              <option>Cope</option><option>Kutia</option><option>Pakete</option><option>Set</option><option>License</option><option>Meter</option><option>Gram</option>
+              <option>Cope</option><option>Metër</option><option>Kuti</option><option>Set</option><option>Paketë</option><option>Licencë</option>
             </select>
           </div>
         </div>
@@ -1279,7 +1274,7 @@ select option{background:#fff}
       <div class="form-grid" style="grid-template-columns:1fr 1fr 1fr">
         <div class="form-group"><label>Nr. Faturës *</label><div style="display:flex;gap:6px;align-items:center"><input id="sv-fat" placeholder="F-SV-001" style="flex:1"><button type="button" onclick="document.getElementById('sv-fat').value=nextFatNr('sv')" title="Gjenero" style="background:#0284c7;border:none;color:#fff;border-radius:8px;padding:0 10px;cursor:pointer;height:40px">🔄</button></div></div>
         <div class="form-group"><label>Data *</label><input id="sv-data" type="date"></div>
-        <div class="form-group" style="position:relative"><label>Klienti *</label><input id="sv-kli" placeholder="Emri klientit" autocomplete="off" oninput="kliSearchInput(this.value, 'sv-kli-dropdown', 'sv-kli')" onfocus="kliSearchInput(this.value, 'sv-kli-dropdown', 'sv-kli')"><div id="sv-kli-dropdown" class="kli-dropdown"></div></div>
+        <div class="form-group"><label>Klienti *</label><input id="sv-kli" placeholder="Emri klientit"></div>
         <div class="form-group"><label>Mënyra Pagesës</label><select id="sv-pag"><option>Cash</option><option>Debitor</option><option>Pjesërisht</option></select></div>
         <div class="form-group"><label>Valuta</label><select id="sv-curr"><option value="ALL">Lekë (L)</option><option value="EUR">Euro (€)</option></select></div>
         <div class="form-group"><label>TVSH (20%)</label><select id="sv-tvsh-opt" onchange="renderServisCart()"><option value="jo">Jo</option><option value="po">Po</option></select></div>
@@ -1289,7 +1284,7 @@ select option{background:#fff}
         <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1.2fr auto;gap:.75rem;align-items:end">
           <div class="form-group" style="margin:0"><label>Përshkrimi i Shërbimit</label><input id="sv-desc" placeholder="Psh: Formatim Laptop..." style="background:#fff;border:1.5px solid #bae6fd"></div>
           <div class="form-group" style="margin:0"><label>Sasia</label><input id="sv-sasia" type="number" value="1" step="0.01" style="background:#fff;border:1.5px solid #bae6fd"></div>
-          <div class="form-group" style="margin:0"><label>Njësia</label><select id="sv-nje" style="background:#fff;border:1.5px solid #bae6fd;padding:9px 8px;font-size:13px;border-radius:9px"><option>Pune</option><option>Cope</option><option>Kutia</option><option>Pakete</option><option>Set</option><option>License</option><option>Meter</option><option>Gram</option></select></div>
+          <div class="form-group" style="margin:0"><label>Njësia</label><select id="sv-nje" style="background:#fff;border:1.5px solid #bae6fd;padding:9px 8px;font-size:13px;border-radius:9px"><option>Pune</option><option>Cope</option><option>Meter</option></select></div>
           <div class="form-group" style="margin:0"><label>Çmimi (L)</label><input id="sv-cm" type="number" placeholder="0" style="background:#fff;border:1.5px solid #bae6fd"></div>
           <button class="btn btn-sm" style="background:#0284c7;color:#fff;border:none;height:42px;padding:0 15px;font-weight:700" onclick="svAddRow()">➕ Shto</button>
         </div>
@@ -1306,7 +1301,7 @@ select option{background:#fff}
   </div>
 </div>
 
-<div class="modal-overlay" id="modal-addshpenzim" >
+<div class="modal-overlay" id="modal-addshpenzim" onclick="closeModal(event,'modal-addshpenzim')">
   <div class="modal-box">
     <div class="modal-header"><div class="modal-title">💸 Shto Shpenzim</div><div style="display:flex;gap:8px;align-items:center"><button class="modal-close" title="Maksimizo" onclick="toggleMaximize('modal-addshpenzim',this)">□</button><button class="modal-close" title="Minimizo" onclick="minimizeModal('modal-addshpenzim','💸 Shpenzim')">—</button><button class="modal-close" onclick="closeModalById('modal-addshpenzim')">×</button></div></div>
     <div class="form-grid">
@@ -1346,7 +1341,7 @@ select option{background:#fff}
   </div>
 </div>
 
-<div class="modal-overlay" id="modal-editafat" >
+<div class="modal-overlay" id="modal-editafat" onclick="closeModal(event,'modal-editafat')">
   <div class="modal-box" style="max-width:420px">
     <div class="modal-header"><div class="modal-title">✏️ Ndrysho Detajet e Debitorit</div><div style="display:flex;gap:8px;align-items:center"><button class="modal-close" onclick="closeModalById('modal-editafat')">×</button></div></div>
     <input type="hidden" id="eaf-fat">
@@ -1364,14 +1359,14 @@ select option{background:#fff}
   </div>
 </div>
 
-<div class="modal-overlay" id="modal-editprod" >
+<div class="modal-overlay" id="modal-editprod" onclick="closeModal(event,'modal-editprod')">
   <div class="modal-box">
     <div class="modal-header"><div class="modal-title">✏ Ndrysho Produktin</div><div style="display:flex;gap:8px;align-items:center"><button class="modal-close" title="Maksimizo" onclick="toggleMaximize('modal-editprod',this)">□</button><button class="modal-close" title="Minimizo" onclick="minimizeModal('modal-editprod','✏ Ndrysho Produkt')">—</button><button class="modal-close" onclick="closeModalById('modal-editprod')">×</button></div></div>
     <div class="form-grid">
       <div class="form-group"><label>Kodi</label><input id="ep-id" readonly style="background:#f8fafc;color:var(--text3)"></div>
       <div class="form-group"><label>Emri *</label><input id="ep-name" placeholder="Emri i produktit"></div>
       <div class="form-group"><label>Kategoria</label><input id="ep-kat" placeholder="Laptop, Kamera..."></div>
-      <div class="form-group"><label>Njësia</label><select id="ep-nje"><option>Cope</option><option>Kutia</option><option>Pakete</option><option>Set</option><option>License</option><option>Meter</option><option>Gram</option></select></div>
+      <div class="form-group"><label>Njësia</label><select id="ep-nje"><option>Cope</option><option>Kuti</option><option>Set</option><option>Metër</option><option>Paketë</option><option>Licencë</option></select></div>
       <div class="form-group"><label>Çmimi Blerjes (L)</label><input id="ep-cmb" type="number" placeholder="0"></div>
       <div class="form-group"><label>Çmimi Shitjes 1 (L)</label><input id="ep-cms" type="number" placeholder="0"></div>
       <div class="form-group"><label>Çmimi Shitjes 2 (L)</label><input id="ep-cms2" type="number" placeholder="(opsionale)"></div>
@@ -1386,14 +1381,14 @@ select option{background:#fff}
   </div>
 </div>
 
-<div class="modal-overlay" id="modal-editshitje" >
+<div class="modal-overlay" id="modal-editshitje" onclick="closeModal(event,'modal-editshitje')">
   <div class="modal-box" style="width:600px;max-width:98vw">
     <div class="modal-header"><div class="modal-title">✏ Ndrysho Shitjen</div><div style="display:flex;gap:8px;align-items:center"><button class="modal-close" title="Maksimizo" onclick="toggleMaximize('modal-editshitje',this)">□</button><button class="modal-close" title="Minimizo" onclick="minimizeModal('modal-editshitje','✏ Ndrysho Shitje')">—</button><button class="modal-close" onclick="closeModalById('modal-editshitje')">×</button></div></div>
     <div class="form-grid" style="grid-template-columns:1fr 1fr">
       <div class="form-group"><label>Nr. Faturës</label><input id="esh-fat" readonly style="background:#f8fafc;color:var(--text3)"></div>
       <div class="form-group"><label>Data *</label><input id="esh-data" type="date"></div>
       <div class="form-group"><label>Klienti *</label><input id="esh-kli" placeholder="Emri klientit"></div>
-      <div class="form-group"><label>Mënyra Pagesës</label><select id="esh-pag"><option>Cash</option><option>Debitor</option><option>Pjesërisht</option><option>Preventiv</option></select></div>
+      <div class="form-group"><label>Mënyra Pagesës</label><select id="esh-pag"><option>Cash</option><option>Servis</option><option>Debitor</option><option>Pjesërisht</option><option>Preventiv</option></select></div>
       <div class="form-group"><label>TVSH (20%)</label><select id="esh-tvsh-opt"><option value="po">Po</option><option value="jo">Jo</option></select></div>
       <div class="form-group"><label>Statusi</label><select id="esh-status"><option value="paguar">✓ Paguar</option><option value="papaguar">✗ Pa Paguar</option><option value="pjeserisht">◑ Pjesërisht</option><option value="preventiv">📝 Preventiv</option></select></div>
       <div class="form-group"><label>Borxhi Mbetur (L)</label><input id="esh-borxh" type="number" placeholder="0"></div>
@@ -1407,7 +1402,7 @@ select option{background:#fff}
   </div>
 </div>
 
-<div class="modal-overlay" id="modal-editblerje" >
+<div class="modal-overlay" id="modal-editblerje" onclick="closeModal(event,'modal-editblerje')">
   <div class="modal-box">
     <div class="modal-header"><div class="modal-title">✏ Ndrysho Blerjen</div><div style="display:flex;gap:8px;align-items:center"><button class="modal-close" title="Maksimizo" onclick="toggleMaximize('modal-editblerje',this)">□</button><button class="modal-close" title="Minimizo" onclick="minimizeModal('modal-editblerje','✏ Ndrysho Blerje')">—</button><button class="modal-close" onclick="closeModalById('modal-editblerje')">×</button></div></div>
     <div class="form-grid">
@@ -1452,12 +1447,6 @@ const SUPA_KEY = 'sb_publishable_aI6cQDd_9bjXfQ4HRwbiZw_POPTOZlV';
 const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
 
 async function sbLoad(){
-  // Kontrollo nëse localStorage ka të dhëna të ruajtura (shenjues që përdoruesi ka bazë të dhënash)
-  const hasLocalData = localStorage.getItem('tp_shitjet') !== null;
-  const localBlerjet = hasLocalData ? JSON.parse(localStorage.getItem('tp_blerjet')||'[]') : null;
-  const localShitjet = hasLocalData ? JSON.parse(localStorage.getItem('tp_shitjet')||'[]') : null;
-  const localFaturatMeta = hasLocalData ? JSON.parse(localStorage.getItem('tp_faturat_meta')||'{}') : null;
-
   try {
     const [u,p,bl,sh,shp,fm,cfg] = await Promise.all([
       sb.from('users').select('*'),
@@ -1470,33 +1459,12 @@ async function sbLoad(){
     ]);
     if(u.data?.length) users = u.data;
     if(p.data?.length) products = p.data;
-    // Nëse localStorage ka shitjet bosh (përdoruesi i fshiu), mos ngarko nga Supabase
-    if(bl.data?.length){
-      if(hasLocalData && localBlerjet !== null && localBlerjet.length === 0){
-        blerjet = []; // Respekto fshirjen lokale
-      } else {
-        blerjet = bl.data.map(b=>({...b,cmb:Number(b.cmb),sasia:Number(b.sasia)}));
-      }
-    } else if(hasLocalData && localBlerjet !== null){
-      blerjet = localBlerjet.map(b=>({...b,cmb:Number(b.cmb),sasia:Number(b.sasia)}));
-    }
-    if(sh.data?.length){
-      if(hasLocalData && localShitjet !== null && localShitjet.length === 0){
-        shitjet = []; // Respekto fshirjen lokale
-      } else {
-        shitjet = sh.data.map(s=>({...s,cms:Number(s.cms),sasia:Number(s.sasia),borxh:Number(s.borxh||0),ts:s.ts?Number(s.ts):null}));
-      }
-    } else if(hasLocalData && localShitjet !== null){
-      shitjet = localShitjet.map(s=>({...s,cms:Number(s.cms),sasia:Number(s.sasia),borxh:Number(s.borxh||0),ts:s.ts?Number(s.ts):null}));
-    }
+    if(bl.data?.length) blerjet = bl.data.map(b=>({...b,cmb:Number(b.cmb),sasia:Number(b.sasia)}));
+    if(sh.data?.length) shitjet = sh.data.map(s=>({...s,cms:Number(s.cms),sasia:Number(s.sasia),borxh:Number(s.borxh||0),ts:s.ts?Number(s.ts):null}));
     if(shp.data?.length) shpenzimet = shp.data.map(s=>({...s,vlera:Number(s.vlera)}));
     if(fm.data?.length){
-      if(hasLocalData && localFaturatMeta !== null && Object.keys(localFaturatMeta).length === 0){
-        faturatMeta = {}; // Respekto fshirjen lokale
-      } else {
-        faturatMeta={};
-        fm.data.forEach(f=>faturatMeta[f.fat]={status:f.status,paguar:Number(f.paguar),borxh:Number(f.borxh)});
-      }
+      faturatMeta={};
+      fm.data.forEach(f=>faturatMeta[f.fat]={status:f.status,paguar:Number(f.paguar),borxh:Number(f.borxh)});
     }
     if(cfg.data) {
       const adresaStr = cfg.data.adresa||'';
@@ -1511,30 +1479,11 @@ async function sbLoad(){
 
 async function sbSave(){
   try {
-    // Fshi rreshtat e vjetër nga Supabase para se të bëjmë upsert
-    // Kjo siguron që fshirja lokale reflektohet edhe në Supabase
-    const currentBlerjeIds = blerjet.map(b=>b.id);
-    const currentShitjeIds = shitjet.map(s=>s.id);
-    const currentFatMeta = Object.keys(faturatMeta);
-    const currentProductIds = products.map(p=>p.id);
-    const currentShpenzimeIds = shpenzimet.map(s=>s.id);
-
-    // Nëse array-t janë bosh, fshi të gjitha rreshtat nga Supabase
-    if(blerjet.length === 0){
-      await sb.from('blerjet').delete().neq('id','__nuk_ekziston__');
-    }
-    if(shitjet.length === 0){
-      await sb.from('shitjet').delete().neq('id','__nuk_ekziston__');
-    }
-    if(currentFatMeta.length === 0){
-      await sb.from('faturat_meta').delete().neq('fat','__nuk_ekziston__');
-    }
-
     await Promise.all([
-      products.length > 0 ? sb.from('products').upsert(products) : Promise.resolve(),
-      blerjet.length > 0 ? sb.from('blerjet').upsert(blerjet) : Promise.resolve(),
-      shitjet.length > 0 ? sb.from('shitjet').upsert(shitjet) : Promise.resolve(),
-      shpenzimet.length > 0 ? sb.from('shpenzimet').upsert(shpenzimet) : Promise.resolve(),
+      sb.from('products').upsert(products),
+      sb.from('blerjet').upsert(blerjet),
+      sb.from('shitjet').upsert(shitjet),
+      sb.from('shpenzimet').upsert(shpenzimet),
       sb.from('users').upsert(users),
       sb.from('biz_cfg').upsert({id:1,emri:bizCfg.emri,nipt:bizCfg.nipt,tel:bizCfg.tel,adresa:bizCfg.adresa,footer:bizCfg.footer,pref_sh:bizCfg.prefSh,pref_bl:bizCfg.prefBl,pad:bizCfg.pad}),
       ...Object.entries(faturatMeta).map(([fat,v])=>sb.from('faturat_meta').upsert({fat,status:v.status,paguar:v.paguar||0,borxh:v.borxh||0}))
@@ -1741,10 +1690,6 @@ function _applyRoleUI(role) {
   // Butoni "Fshi të Gjitha Faturat" — vetëm admin
   const btnFshiFaturat = document.getElementById('btn-fshi-te-gjitha-faturat');
   if(btnFshiFaturat) btnFshiFaturat.style.display = role === 'admin' ? 'inline-flex' : 'none';
-
-  // Butoni "Rivendos nga Arkivi" — vetëm admin
-  const btnRestauroArkiv = document.getElementById('btn-restauro-arkiv');
-  if(btnRestauroArkiv) btnRestauroArkiv.style.display = role === 'admin' ? 'inline-flex' : 'none';
 
   // Xhiro — kufizime për user
   const xhiroMbyllKpi = document.getElementById('xhiro-mbyll-kpi');
@@ -1954,37 +1899,22 @@ let products = JSON.parse(localStorage.getItem('tp_products')||'null')||[
   { "id": "ART-009", "name": "Produkt Shembull 9", "kat": "Kategoria D", "nje": "Copë", "cmb": 1800.0, "cms": 2700.0, "stok": 25.0, "min": 5.0, "foto": "" },
   { "id": "ART-010", "name": "Produkt Shembull 10", "kat": "Kategoria D", "nje": "Copë", "cmb": 150.0, "cms": 250.0, "stok": 120.0, "min": 25.0, "foto": "" }
 ];
-// Ngarko blerjet: nëse localStorage ka vlerë (edhe bosh []), respekto atë; mos ngarko shembujt
-let blerjet = (()=>{
-  const raw = localStorage.getItem('tp_blerjet');
-  if(raw !== null) return JSON.parse(raw); // ka të dhëna ose array bosh - respekto
-  return [
-    {id:"B001",fat:"F-BL-001",data:"2025-06-01",furn:"Tech Import SH.P.K",prod:"P001",sasia:5,cmb:65000},
-    {id:"B002",fat:"F-BL-001",data:"2025-06-01",furn:"Tech Import SH.P.K",prod:"P003",sasia:8,cmb:18000},
-    {id:"B003",fat:"F-BL-002",data:"2025-06-03",furn:"Digital World Albania",prod:"P005",sasia:10,cmb:4500},
-    {id:"B004",fat:"F-BL-002",data:"2025-06-03",furn:"Digital World Albania",prod:"P009",sasia:4,cmb:12000},
-    {id:"B005",fat:"F-BL-003",data:"2025-06-05",furn:"Network Solutions",prod:"P007",sasia:10,cmb:3500},
-  ];
-})();
-// Ngarko shitjet: nëse localStorage ka vlerë (edhe bosh []), respekto atë; mos ngarko shembujt
-let shitjet = (()=>{
-  const raw = localStorage.getItem('tp_shitjet');
-  if(raw !== null) return JSON.parse(raw); // ka të dhëna ose array bosh - respekto
-  return [
-    {id:"S001",fat:"F-SH-001",data:"2025-06-01",kli:"Bashkim Hoxha",prod:"P001",sasia:2,cms:80000,pag:"Transfer"},
-    {id:"S002",fat:"F-SH-001",data:"2025-06-01",kli:"Bashkim Hoxha",prod:"P003",sasia:2,cms:24000,pag:"Transfer"},
-    {id:"S003",fat:"F-SH-002",data:"2025-06-02",kli:"Gëzim Leka",prod:"P005",sasia:4,cms:6500,pag:"Cash"},
-    {id:"S004",fat:"F-SH-002",data:"2025-06-02",kli:"Gëzim Leka",prod:"P009",sasia:1,cms:17000,pag:"Cash"},
-    {id:"S005",fat:"F-SH-003",data:"2025-06-03",kli:"Drita Shehu",prod:"P007",sasia:3,cms:5000,pag:"Kartë"},
-    {id:"S006",fat:"F-SH-004",data:"2025-06-04",kli:"Artan Muka",prod:"P012",sasia:2,cms:11500,pag:"Transfer"},
-  ];
-})();
-// Ngarko faturatMeta: nëse localStorage ka vlerë, respekto atë
-let faturatMeta = (()=>{
-  const raw = localStorage.getItem('tp_faturat_meta');
-  if(raw !== null) return JSON.parse(raw);
-  return {};
-})();
+let blerjet = JSON.parse(localStorage.getItem('tp_blerjet')||'null')||[
+  {id:"B001",fat:"F-BL-001",data:"2025-06-01",furn:"Tech Import SH.P.K",prod:"P001",sasia:5,cmb:65000},
+  {id:"B002",fat:"F-BL-001",data:"2025-06-01",furn:"Tech Import SH.P.K",prod:"P003",sasia:8,cmb:18000},
+  {id:"B003",fat:"F-BL-002",data:"2025-06-03",furn:"Digital World Albania",prod:"P005",sasia:10,cmb:4500},
+  {id:"B004",fat:"F-BL-002",data:"2025-06-03",furn:"Digital World Albania",prod:"P009",sasia:4,cmb:12000},
+  {id:"B005",fat:"F-BL-003",data:"2025-06-05",furn:"Network Solutions",prod:"P007",sasia:10,cmb:3500},
+];
+let shitjet = JSON.parse(localStorage.getItem('tp_shitjet')||'null')||[
+  {id:"S001",fat:"F-SH-001",data:"2025-06-01",kli:"Bashkim Hoxha",prod:"P001",sasia:2,cms:80000,pag:"Transfer"},
+  {id:"S002",fat:"F-SH-001",data:"2025-06-01",kli:"Bashkim Hoxha",prod:"P003",sasia:2,cms:24000,pag:"Transfer"},
+  {id:"S003",fat:"F-SH-002",data:"2025-06-02",kli:"Gëzim Leka",prod:"P005",sasia:4,cms:6500,pag:"Cash"},
+  {id:"S004",fat:"F-SH-002",data:"2025-06-02",kli:"Gëzim Leka",prod:"P009",sasia:1,cms:17000,pag:"Cash"},
+  {id:"S005",fat:"F-SH-003",data:"2025-06-03",kli:"Drita Shehu",prod:"P007",sasia:3,cms:5000,pag:"Kartë"},
+  {id:"S006",fat:"F-SH-004",data:"2025-06-04",kli:"Artan Muka",prod:"P012",sasia:2,cms:11500,pag:"Transfer"},
+];
+let faturatMeta = JSON.parse(localStorage.getItem('tp_faturat_meta')||'null')||{};
 let shpenzimet = JSON.parse(localStorage.getItem('tp_shpenzimet')||'null')||[
   {id:"SH001",data:"2025-06-01",kat:"Qiraja",pershkrim:"Qiraja e muajit Qershor",vlera:50000,pag:"Transfer"},
   {id:"SH002",data:"2025-06-01",kat:"Pagat",pershkrim:"Pagat e stafit - Qershor",vlera:80000,pag:"Transfer"},
@@ -2149,19 +2079,6 @@ function shikoDetajetXhiro(index) {
     return itemRows;
   }).join('');
 
-  // Rreshtat e arkëtimeve të debitorëve — shfaqen direkt te tabela kryesore me etiketë "🔵 Pagesë Debitori"
-  const arkRowsMain = (mbyllja.arketimet||[]).map(a => `
-      <tr style="background:#eff6ff">
-        <td style="padding:10px 12px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent);font-weight:700;border:1px solid #e2e8f0">${a.fat}</td>
-        <td style="padding:10px 12px;font-weight:600;border:1px solid #e2e8f0">${a.kli}</td>
-        <td style="padding:10px 12px;color:var(--text2);border:1px solid #e2e8f0">—</td>
-        <td style="padding:10px 12px;text-align:center;border:1px solid #e2e8f0">—</td>
-        <td style="padding:10px 12px;text-align:right;border:1px solid #e2e8f0">—</td>
-        <td style="padding:10px 12px;text-align:center;border:1px solid #e2e8f0"><span style="font-size:10px;font-weight:700;color:#1d4ed8;background:#dbeafe;padding:2px 7px;border-radius:20px">🔵 Pagesë Debitori</span></td>
-        <td style="padding:10px 12px;text-align:right;font-weight:700;color:#1d4ed8;border:1px solid #e2e8f0">${fmtModal(a.shuma,curr)}</td>
-      </tr>`).join('');
-  rows += arkRowsMain;
-
   // Footer llogaritje
   const footerRows = `
     <tr style="border-top:2px solid #e5e7eb;background:#f9fafb">
@@ -2204,14 +2121,12 @@ function shikoDetajetXhiro(index) {
           <th style="padding:6px 10px;text-align:left;color:#7c3aed">Nr. Faturës</th>
           <th style="padding:6px 10px;text-align:left;color:#7c3aed">Klienti</th>
           <th style="padding:6px 10px;text-align:left;color:#7c3aed">Data Faturës</th>
-          <th style="padding:6px 10px;text-align:center;color:#7c3aed">Shenjë</th>
           <th style="padding:6px 10px;text-align:right;color:#7c3aed">Arkëtuar</th>
         </tr></thead>
         <tbody>${mbyllja.arketimet.map(a=>`<tr style="border-top:1px solid #ede9fe">
           <td style="padding:6px 10px;font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent)">${a.fat}</td>
           <td style="padding:6px 10px;font-weight:600">${a.kli}</td>
           <td style="padding:6px 10px;color:var(--text3)">${a.dataFat||'—'}</td>
-          <td style="padding:6px 10px;text-align:center"><span style="font-size:10px;font-weight:700;color:#1d4ed8;background:#dbeafe;padding:2px 7px;border-radius:20px">🔵 Pagesë Debitori</span></td>
           <td style="padding:6px 10px;text-align:right;font-weight:700;color:#7c3aed">${fmtModal(a.shuma,curr)}</td>
         </tr>`).join('')}</tbody>
       </table>
@@ -2440,48 +2355,6 @@ function toLocalISODate(d){
   return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 }
 function getProd(id){return products.find(p=>p.id===id)}
-
-function kliSearchInput(q, dropdownId, inputId) {
-  const dropdown = document.getElementById(dropdownId);
-  if (!dropdown) return;
-  q = q.trim().toLowerCase();
-  
-  // Mbledh të gjithë klientët unikë nga shitjet dhe serviset
-  const kliShitje = shitjet.map(s => s.kli);
-  const kliMeta = Object.values(faturatMeta).map(m => m.kli).filter(Boolean);
-  const allKli = [...new Set([...kliShitje, ...kliMeta])].filter(Boolean);
-  
-  if (!q) {
-    dropdown.style.display = 'none';
-    return;
-  }
-  
-  const found = allKli.filter(k => k.toLowerCase().includes(q)).slice(0, 10);
-  
-  if (found.length === 0) {
-    dropdown.style.display = 'none';
-    return;
-  }
-  
-  dropdown.innerHTML = found.map(k => `<div class="kli-item" onclick="kliSelect('${k}', '${dropdownId}', '${inputId}')">${k}</div>`).join('');
-  dropdown.style.display = 'block';
-  
-  // Mbyll dropdown kur klikohet jashtë
-  const closeKliDropdown = (e) => {
-    if (!e.target.closest('.form-group')) {
-      dropdown.style.display = 'none';
-      document.removeEventListener('click', closeKliDropdown);
-    }
-  };
-  document.addEventListener('click', closeKliDropdown);
-}
-
-function kliSelect(val, dropdownId, inputId) {
-  const input = document.getElementById(inputId);
-  if (input) input.value = val;
-  const dropdown = document.getElementById(dropdownId);
-  if (dropdown) dropdown.style.display = 'none';
-}
 function badge(txt,bg,color){return `<span class="badge" style="background:${bg};color:${color}">${txt}</span>`}
 function prodEmoji(kat){
   const m={'Laptop':'💻','PC Desktop':'🖥️','Monitor':'🖥','Kamera':'📷','Switch':'🔌','NVR':'📹','Rrjet':'📡','UPS':'🔋','Aksesore':'🖱️','Kablë':'🔗','Printer':'🖨️','Tablet':'📱','Server':'🗄️','Tjetër':'📦'};
@@ -2809,29 +2682,17 @@ function closeProdDropdownBlerje(e){
 }
 
 function blerjeCartAdd(){
-  const prodId=document.getElementById('b-prod').value; // Kodi i fshehur (nëse u zgjodh nga lista)
-  const prodSearchVal=document.getElementById('b-prod-search').value.trim(); // Teksti i shkruar
+  const prodId=document.getElementById('b-prod').value;
   const sasia=+document.getElementById('b-sasia').value;
   const nje=document.getElementById('b-nje').value;
   const cmb=+document.getElementById('b-cmb').value;
-  
-  if(!prodSearchVal){alert('Shkruaj emrin e produktit!');return;}
+  if(!prodId){alert('Zgjidh produktin!');return;}
   if(!sasia||sasia<=0){alert('Sasia duhet të jetë > 0!');return;}
   if(!cmb||cmb<0){alert('Plotëso çmimin!');return;}
-  
   const p=getProd(prodId);
-  // Nëse nuk u zgjodh nga lista (prodId bosh), përdorim tekstin e shkruar si emër
-  const finalProdId = prodId || ('PROD-' + Date.now().toString(36).toUpperCase());
-  const finalName = p ? p.name : prodSearchVal;
-  
-  const ex=blerjeCart.findIndex(c=>c.prodId===finalProdId&&c.cmb===cmb&&c.nje===nje);
-  if(ex>=0){
-    blerjeCart[ex].sasia+=sasia;
-    blerjeCart[ex].total=Math.round(blerjeCart[ex].sasia*blerjeCart[ex].cmb*100)/100;
-  } else {
-    blerjeCart.push({prodId: finalProdId, name: finalName, nje, sasia, cmb, total:Math.round(sasia*cmb*100)/100});
-  }
-  
+  if(!p){alert('Produkti nuk u gjet!');return;}
+  const ex=blerjeCart.findIndex(c=>c.prodId===prodId&&c.cmb===cmb&&c.nje===nje);
+  if(ex>=0){blerjeCart[ex].sasia+=sasia;blerjeCart[ex].total=Math.round(blerjeCart[ex].sasia*blerjeCart[ex].cmb*100)/100;}  else blerjeCart.push({prodId,name:p.name,nje,sasia,cmb,total:Math.round(sasia*cmb*100)/100});
   document.getElementById('b-sasia').value='1';
   document.getElementById('b-cmb').value='';
   document.getElementById('b-prod').value='';
@@ -2914,11 +2775,7 @@ function selectProd(id){
     document.getElementById('s-sasia').focus();
   }
 }
-function closeModal(e,id){
-  // Çaktivizuar mbylljen me klikim jashtë sipas kërkesës së përdoruesit
-  // Përdoruesi duhet të klikojë butonin X ose Anulo
-  return;
-}
+function closeModal(e,id){if(e.target===e.currentTarget){document.getElementById(id).classList.remove('open','minimized');removeTaskbarPill(id);}}
 function closeModalById(id){document.getElementById(id).classList.remove('open','minimized');removeTaskbarPill(id);}
 
 function minimizeModal(id,title){
@@ -2976,7 +2833,6 @@ function makeDraggable(boxEl, handleEl){
   function start(clientX, clientY){
     if(window.innerWidth<=768)return;
     dragging=true;
-    window._isDragging=true;
     const rect=boxEl.getBoundingClientRect();
     offsetX=clientX-rect.left;
     offsetY=clientY-rect.top;
@@ -2995,11 +2851,7 @@ function makeDraggable(boxEl, handleEl){
     boxEl.style.left=x+'px';
     boxEl.style.top=y+'px';
   }
-  function end(){
-    dragging=false;
-    setTimeout(() => { window._isDragging = false; }, 50);
-    document.body.style.userSelect='';
-  }
+  function end(){dragging=false;document.body.style.userSelect='';}
   handleEl.addEventListener('mousedown', e=>{
     if(e.target.closest('.modal-close'))return;
     start(e.clientX, e.clientY);
@@ -3107,7 +2959,6 @@ async function addBlerje(){
   const data=document.getElementById('b-data').value;
   const curr=document.getElementById('b-curr').value;
   const tvshOpt=document.getElementById('b-tvsh-opt').value;
-  const pag=document.getElementById('b-pag').value;
   if(!fat){alert('Shkruaj numrin e faturës!');return;}
   if(!furn){alert('Shkruaj emrin e furnitorit!');return;}
   if(!data){alert('Zgjidh datën!');return;}
@@ -3123,58 +2974,20 @@ async function addBlerje(){
     });
   }
   blerjeCart.forEach(c=>{
-    blerjet.push({id:'B'+Date.now()+Math.random().toString(36).slice(2,6),fat,data,furn,prod:c.prodId,sasia:c.sasia,cmb:c.cmb,name:c.name,pag});
-    const p=products.find(x=>x.id===c.prodId);
-    if(p){
-      p.stok+=c.sasia;
-    } else {
-      // Nëse produkti nuk ekziston në listën kryesore, e shtojmë automatikisht me stokun e blerjes
-      products.push({
-        id: c.prodId,
-        name: c.name,
-        kat: 'Tjetër',
-        nje: c.nje,
-        cmb: c.cmb,
-        cms: c.cmb * 1.2, // Çmim shitjeje i sugjeruar (20% marzhë)
-        stok: c.sasia,
-        min: 1,
-        foto: ''
-      });
-    }
+    blerjet.push({id:'B'+Date.now()+Math.random().toString(36).slice(2,6),fat,data,furn,prod:c.prodId,sasia:c.sasia,cmb:c.cmb});
+    const p=products.find(x=>x.id===c.prodId);if(p)p.stok+=c.sasia;
   });
-  const subtotalTotal=cartSnapshot.reduce((s,c)=>s+c.total,0);
-  const tvshTotal = tvshOpt==='po' ? subtotalTotal*0.2 : 0;
-  const totalFature = subtotalTotal + tvshTotal;
-  
-  if(!faturatMeta[fat]) {
-    faturatMeta[fat] = {
-      status: pag === 'Cash' ? 'paguar' : 'papaguar',
-      valuta: curr,
-      tvshOpt,
-      data,
-      pale: furn,
-      paguar: pag === 'Cash' ? totalFature : 0,
-      borxh: pag === 'Cash' ? 0 : totalFature
-    };
-  }
+  if(!faturatMeta[fat]) faturatMeta[fat] = {status:'paguar', valuta:curr, tvshOpt, data, pale:furn};
   blerjeCart=[];
   save();
   closeModalById('modal-addblerje');
   document.removeEventListener('click', closeProdDropdownBlerje, true);
   renderAll();
-  // Pastro fushat për herën tjetër
   document.getElementById('b-furn').value='';
-  document.getElementById('b-prod-search').value='';
-  document.getElementById('b-prod').value='';
-  document.getElementById('b-sasia').value='1';
-  document.getElementById('b-cmb').value='';
-  document.getElementById('b-fat').value=nextFatNr('bl');
-  blerjeCart=[];
-  renderBlerjeCart();
   const items=cartSnapshot.map(c=>({name:c.name,kodi:c.prodId,nje:c.nje,sasia:c.sasia,cm:c.cmb,total:c.total}));
   const subtotal=cartSnapshot.reduce((s,c)=>s+c.total,0);
   const tvsh = tvshOpt==='po' ? subtotal*0.2 : 0;
-  currentFatureData={tipi:'BLERJES',fat,data,pale:furn,pag:pag,items,subtotal,tvsh,total:subtotal+tvsh,status:pag==='Cash'?'paguar':'papaguar',paguar:pag==='Cash'?subtotal+tvsh:0,borxh:pag==='Cash'?0:subtotal+tvsh,afat:'',valuta:curr};
+  currentFatureData={tipi:'BLERJES',fat,data,pale:furn,pag:'Transfer',items,subtotal,tvsh,total:subtotal+tvsh,status:'paguar',paguar:subtotal+tvsh,borxh:0,afat:'',valuta:curr};
   showFatureInline();
 }
 
@@ -3243,28 +3056,8 @@ function saveEditShitje(){
     s.pag=pag;
     if(data === today()) s.ts = Date.now();
   });
-  // Përditëso statusin automatikisht nëse zgjidhet Cash
-  let finalStatus = status;
-  let finalPaguar = paguar;
-  let finalBorxh = borxh;
-  
-  if (pag === 'Cash') {
-    finalStatus = 'paguar';
-    // Llogarit totalin e faturës për të vendosur shumën e paguar
-    const totFat = shitjePerFat.reduce((s,x) => s+(x.sasia||0)*(x.cms||0),0);
-    const totalMeTVSH = tvshOpt === 'po' ? totFat * 1.2 : totFat;
-    finalPaguar = totalMeTVSH;
-    finalBorxh = 0;
-  } else if (pag === 'Debitor') {
-    finalStatus = 'papaguar';
-    const totFat = shitjePerFat.reduce((s,x) => s+(x.sasia||0)*(x.cms||0),0);
-    const totalMeTVSH = tvshOpt === 'po' ? totFat * 1.2 : totFat;
-    finalPaguar = 0;
-    finalBorxh = totalMeTVSH;
-  }
-  
   const oldMeta=faturatMeta[fat]||{};
-  faturatMeta[fat]={...oldMeta,status:finalStatus,paguar:finalPaguar,borxh:finalBorxh,afat,kli,data,tvshOpt};
+  faturatMeta[fat]={...oldMeta,status,paguar,borxh,afat,kli,data,tvshOpt};
   save();closeModalById('modal-editshitje');renderAll();
   alert('✓ Shitja u ndryshua me sukses!');
 }
@@ -3817,14 +3610,6 @@ async function addShitje() {
 
     renderCart();
     
-    // Pastro fushat shtesë për herën tjetër
-    document.getElementById('s-prod-search').value='';
-    document.getElementById('s-prod').value='';
-    document.getElementById('s-cms').value='';
-    document.getElementById('s-sasia').value='1';
-    document.getElementById('s-pag').value='Cash';
-    document.getElementById('pjeserisht-row').style.display='none';
-    
     showToast('✓ Shitja u regjistrua me sukses!');
     
     const items = cartSnapshot.map(c => ({
@@ -4080,82 +3865,15 @@ function deleteUser(username){
   save(); renderAll();
 }
 
-function importoArkivinFaturave(input){
-  if(currentRole !== 'admin') { alert('⛔ Vetëm administratori mund të rivendosë arkivin!'); input.value=''; return; }
-  const file = input.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    try{
-      const data = JSON.parse(e.target.result);
-
-      // Validim bazik — duhet të jetë skedar arkivi i krijuar nga sistemi
-      const fushatPritura = ['products','blerjet','shitjet','faturatMeta','arketimet','xhiroHistoriku'];
-      const kaTeDhena = fushatPritura.some(k => Object.prototype.hasOwnProperty.call(data, k));
-      if(!kaTeDhena){
-        alert('⛔ Skedari nuk duket si arkiv i vlefshëm i faturave (mungojnë të dhënat e pritura).');
-        input.value=''; return;
-      }
-
-      const totAktual = [...new Set([...shitjet.map(s=>s.fat), ...blerjet.map(b=>b.fat)])].length;
-      const totArkiv = [...new Set([...(data.shitjet||[]).map(s=>s.fat), ...(data.blerjet||[]).map(b=>b.fat)])].length;
-
-      if(!confirm(`⚠️ KUJDES! Do të RIVENDOSNI të dhënat nga arkivi:\n\n📁 Arkivi: ${data.exportDate||'—'} ${data.exportTime||''}\n🧾 Fatura në arkiv: ${totArkiv}\n\nKjo do të ZËVENDËSOJË faturat aktuale (${totAktual}) me ato të arkivit.\nVazhdoni?`)) {
-        input.value=''; return;
-      }
-
-      // Konfirmim shtesë me password admin
-      const adminUserChk = users.find(u => u.username === currentUser && u.role === 'admin');
-      const pass = prompt('🔒 Për konfirmim, shkruani password-in e administratorit:');
-      if(pass === null){ input.value=''; return; }
-      if(!adminUserChk || pass !== adminUserChk.password){
-        alert('⛔ Password i gabuar! Rivendosja u anulua.');
-        input.value=''; return;
-      }
-
-      if(Array.isArray(data.products))      products      = data.products;
-      if(Array.isArray(data.blerjet))       blerjet       = data.blerjet;
-      if(Array.isArray(data.shitjet))       shitjet       = data.shitjet;
-      if(data.faturatMeta && typeof data.faturatMeta==='object') faturatMeta = data.faturatMeta;
-      if(Array.isArray(data.arketimet))     arketimet     = data.arketimet;
-      if(Array.isArray(data.xhiroHistoriku))xhiroHistoriku= data.xhiroHistoriku;
-
-      save();
-      renderAll();
-      showToast('✅ Arkivi u rivendos me sukses!');
-    }catch(err){
-      console.error('Gabim gjatë rivendosjes së arkivit:', err);
-      alert('⛔ Gabim: skedari nuk u lexua dot. Sigurohuni që është skedar .json i krijuar nga ky sistem.');
-    }
-    input.value='';
-  };
-  reader.readAsText(file);
-}
-
-async function fshiTeGjithaFaturatAdmin() {
+function fshiTeGjithaFaturatAdmin() {
   if(currentRole !== 'admin') { alert('⛔ Vetëm administratori mund të fshijë të gjitha faturat!'); return; }
   const totFatura = [...new Set([...shitjet.map(s=>s.fat), ...blerjet.map(b=>b.fat)])].length;
   if(totFatura === 0) { alert('Nuk ka fatura për të fshirë.'); return; }
   if(!confirm(`⚠️ KUJDES! Do të fshini TË GJITHA ${totFatura} faturat!\n\n✅ Të dhënat do të arkivohen automatikisht në backup para fshirjes.\n\nKjo veprim NUK mund të kthehet. Vazhdoni?`)) return;
 
-  // Konfirmim shtesë me password admin
-  const adminUserChk = users.find(u => u.username === currentUser && u.role === 'admin');
-  const fshiPass = prompt('🔒 Për konfirmim, shkruani password-in e administratorit:');
-  if(fshiPass === null) return; // anuluar
-  if(!adminUserChk || fshiPass !== adminUserChk.password) {
-    alert('⛔ Password i gabuar! Fshirja u anulua.');
-    return;
-  }
-
-  // ARKIVIM AUTOMATIK para fshirjes
-  const arkivData = {
-    exportDate: today(),
-    exportTime: new Date().toLocaleTimeString('sq-AL'),
-    version: 'HSMCenter — Arkiv para fshirjes',
-    note: 'Arkivim automatik i krijuar para fshirjes së të gjitha faturave',
-    products, blerjet, shitjet, faturatMeta, arketimet, xhiroHistoriku
-  };
-  const blob = new Blob([JSON.stringify(arkivData, null, 2)], {type:'application/json'});
+  // ARKIVIM AUTOMATIK i PLOTË para fshirjes (përdor të njëjtin format si Backup Tani)
+  const jsonData = buildBackupJSON();
+  const blob = new Blob([jsonData], {type:'application/json'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = `Arkiv_Fatura_Para_Fshirjes_${today()}.json`;
@@ -4167,23 +3885,6 @@ async function fshiTeGjithaFaturatAdmin() {
   blerjet = [];
   faturatMeta = {};
   arketimet = [];
-
-  // Ruaj në localStorage menjëherë (para Supabase sync)
-  localStorage.setItem('tp_shitjet', JSON.stringify([]));
-  localStorage.setItem('tp_blerjet', JSON.stringify([]));
-  localStorage.setItem('tp_faturat_meta', JSON.stringify({}));
-  localStorage.setItem('tp_arketimet', JSON.stringify([]));
-
-  // Fshi direkt nga Supabase
-  try {
-    await Promise.all([
-      sb.from('shitjet').delete().neq('id','__nuk_ekziston__'),
-      sb.from('blerjet').delete().neq('id','__nuk_ekziston__'),
-      sb.from('faturat_meta').delete().neq('fat','__nuk_ekziston__')
-    ]);
-    console.log('✓ Supabase: faturat u fshinë me sukses');
-  } catch(e){ console.warn('⚠ Supabase delete error:', e); }
-
   save();
   renderAll();
   showToast('✅ Të gjitha faturat u fshiën! Arkivi u shkarkua automatikisht.');
@@ -4209,40 +3910,20 @@ function updateAlarmBadge(){
 function renderDashboard(){
   const totS=shitjet.filter(s=>s.pag!=='Preventiv').reduce((s,x)=>s+x.sasia*x.cms,0);
   const totB=blerjet.reduce((s,x)=>s+x.sasia*x.cmb,0);
-  // Fitimi: për çdo shitje, gjej koston mesatare nga blerjet reale për atë produkt;
-  // nëse nuk ka blerje të regjistruara për produktin, përdor cmb aktuale të produktit si fallback.
-  const kostoProdMap={};
-  blerjet.forEach(b=>{
-    if(!kostoProdMap[b.prod])kostoProdMap[b.prod]={totKosto:0,totSasia:0};
-    kostoProdMap[b.prod].totKosto+=b.sasia*b.cmb;
-    kostoProdMap[b.prod].totSasia+=b.sasia;
-  });
-  const totF=shitjet.filter(s=>s.pag!=='Preventiv').reduce((s,x)=>{
-    let cmb=0;
-    if(kostoProdMap[x.prod]&&kostoProdMap[x.prod].totSasia>0){
-      cmb=kostoProdMap[x.prod].totKosto/kostoProdMap[x.prod].totSasia; // kosto mesatare reale
-    } else {
-      const p=getProd(x.prod);cmb=p?p.cmb:0; // fallback kosto aktuale
-    }
-    return s+x.sasia*(x.cms-cmb);
-  },0);
+  const totF=shitjet.filter(s=>s.pag!=='Preventiv').reduce((s,x)=>{const p=getProd(x.prod);return s+x.sasia*(x.cms-(p?p.cmb:0));},0);
   const alarme=products.filter(p=>p.stok<=p.min);
   const isUser=(currentRole==='user');
-  
-  // Vlera e Stokut (Vlera e Magazinës) = Σ (stok * cmb)
-  const vleraStokut = products.reduce((s,p)=>s+(p.stok*p.cmb),0);
 
   if(isUser){
     document.getElementById('dash-kpi').innerHTML=
       kpiCard('🏪',products.length,'Produkte Aktive','purple','')+
-      kpiCard('🏢',fmtL(vleraStokut),'Vlera e Stokut','blue','')+
       kpiCard('⚠️',alarme.length,'Alarme Stoku','red',alarme.length>0?'Kërkon vëmendje':'Gjithçka mirë');
   } else {
     document.getElementById('dash-kpi').innerHTML=
       kpiCard('💰',fmtL(totS),'Xhiro Totale','blue','↑ Të gjitha kohërat')+
       kpiCard('📦',fmtL(totB),'Blerje Totale','amber','')+
       kpiCard('📈',fmtL(totF),'Fitim Bruto','green','Marzha: '+(totS>0?(totF/totS*100).toFixed(1)+'%':'—'))+
-      kpiCard('🏢',fmtL(vleraStokut),'Vlera e Magazinës','purple','Vlera totale e stokut')+
+      kpiCard('🏪',products.length,'Produkte Aktive','purple','')+
       kpiCard('⚠️',alarme.length,'Alarme Stoku','red',alarme.length>0?'Kërkon vëmendje':'');
   }
 
@@ -4294,74 +3975,40 @@ function renderDashboard(){
           </div>`).join('');
       }
     }
-    renderCharts(totS,totB,totF);
+    renderCharts(totS,totB);
   }
 
   const alEl=document.getElementById('dash-alarme');
   if(alEl) alEl.innerHTML='';
 }
 
-let stokChart=null;
-
-function renderCharts(totS,totB,totF){
-  // ── Grafiku Bar: Shitje / Blerje / Fitim — 7 ditët e fundit ──
+function renderCharts(totS,totB){
   const allDates=[...new Set([...shitjet.map(s=>s.data),...blerjet.map(b=>b.data)])].sort().slice(-7);
   const labels=allDates.map(d=>d.slice(5));
   const dataS=allDates.map(d=>shitjet.filter(s=>s.data===d&&s.pag!=='Preventiv').reduce((a,s)=>a+s.sasia*s.cms,0));
   const dataB=allDates.map(d=>blerjet.filter(b=>b.data===d).reduce((a,b)=>a+b.sasia*b.cmb,0));
 
-  // Fitimi per ditë: shitje − blerje të regjistruara për atë ditë (kosto mesatare reale)
-  const kostoProdMap={};
-  blerjet.forEach(b=>{
-    if(!kostoProdMap[b.prod])kostoProdMap[b.prod]={totKosto:0,totSasia:0};
-    kostoProdMap[b.prod].totKosto+=b.sasia*b.cmb;
-    kostoProdMap[b.prod].totSasia+=b.sasia;
-  });
-  const dataF=allDates.map(d=>{
-    return shitjet.filter(s=>s.data===d&&s.pag!=='Preventiv').reduce((a,s)=>{
-      let cmb=0;
-      if(kostoProdMap[s.prod]&&kostoProdMap[s.prod].totSasia>0){
-        cmb=kostoProdMap[s.prod].totKosto/kostoProdMap[s.prod].totSasia;
-      } else {
-        const p=getProd(s.prod);cmb=p?p.cmb:0;
-      }
-      return a+s.sasia*(s.cms-cmb);
-    },0);
-  });
-
   if(mainChart)mainChart.destroy();
   const ctx=document.getElementById('chart-main');
-  if(ctx){
-    if(!allDates.length){
-      ctx.parentElement.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:rgba(255,255,255,.4);font-size:13px">Nuk ka të dhëna për të shfaqur. Regjistro shitje ose blerje.</div>';
-    } else {
-      // Sigurohu që ka canvas nëse u fshi më parë nga mesazhi
-      if(ctx.tagName !== 'CANVAS'){
-        ctx.parentElement.innerHTML = '<canvas id="chart-main"></canvas>';
+  if(!ctx)return;
+  mainChart=new Chart(ctx,{
+    type:'bar',
+    data:{labels,datasets:[
+      {label:'Shitje',data:dataS,backgroundColor:'rgba(79,110,247,.9)',borderRadius:8,borderSkipped:false,hoverBackgroundColor:'rgba(124,92,252,1)'},
+      {label:'Blerje',data:dataB,backgroundColor:'rgba(245,158,11,.7)',borderRadius:8,borderSkipped:false,hoverBackgroundColor:'rgba(245,158,11,.9)'},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{labels:{font:{family:'Inter',size:11},boxWidth:10,color:'rgba(255,255,255,.7)'}},
+        tooltip:{callbacks:{label:ctx=>' '+fmtL(ctx.parsed.y)},backgroundColor:'rgba(0,0,0,.8)',padding:10,cornerRadius:8}
+      },
+      scales:{
+        x:{grid:{display:false},ticks:{font:{family:'Inter',size:10},color:'rgba(255,255,255,.5)'},border:{display:false}},
+        y:{grid:{color:'rgba(255,255,255,.06)'},ticks:{font:{family:'Inter',size:10},color:'rgba(255,255,255,.4)',callback:v=>fmtL(v)},border:{display:false}}
       }
-      const newCtx = document.getElementById('chart-main');
-      mainChart=new Chart(newCtx,{
-        type:'bar',
-        data:{labels,datasets:[
-          {label:'Shitje',data:dataS,backgroundColor:'rgba(79,110,247,.9)',borderRadius:6,borderSkipped:false,hoverBackgroundColor:'rgba(124,92,252,1)'},
-          {label:'Blerje',data:dataB,backgroundColor:'rgba(245,158,11,.75)',borderRadius:6,borderSkipped:false,hoverBackgroundColor:'rgba(245,158,11,.95)'},
-          {label:'Fitim',data:dataF,backgroundColor:'rgba(34,197,94,.85)',borderRadius:6,borderSkipped:false,hoverBackgroundColor:'rgba(22,163,74,1)'},
-        ]},
-        options:{responsive:true,maintainAspectRatio:false,
-          plugins:{
-            legend:{labels:{font:{family:'Inter',size:11},boxWidth:10,color:'rgba(255,255,255,.75)',padding:14}},
-            tooltip:{callbacks:{label:c=>' '+c.dataset.label+': '+fmtL(c.parsed.y)},backgroundColor:'rgba(15,17,30,.92)',padding:11,cornerRadius:9,titleFont:{family:'Inter',size:11},bodyFont:{family:'Inter',size:12}}
-          },
-          scales:{
-            x:{grid:{display:false},ticks:{font:{family:'Inter',size:10},color:'rgba(255,255,255,.5)'},border:{display:false}},
-            y:{grid:{color:'rgba(255,255,255,.06)'},ticks:{font:{family:'Inter',size:10},color:'rgba(255,255,255,.4)',callback:v=>fmtL(v)},border:{display:false}}
-          }
-        }
-      });
     }
-  }
+  });
 
-  // ── Donuti 1: Shitje sipas Kategorisë ──
   const katMap={};
   shitjet.filter(s=>s.pag!=='Preventiv').forEach(s=>{const p=getProd(s.prod);const k=p?p.kat:'Tjetër';katMap[k]=(katMap[k]||0)+s.sasia*s.cms;});
   const katLabels=Object.keys(katMap);
@@ -4370,49 +4017,12 @@ function renderCharts(totS,totB,totF){
 
   if(donutChart)donutChart.destroy();
   const ctx2=document.getElementById('chart-donut');
-  if(ctx2){
-    if(!katLabels.length){
-      ctx2.parentElement.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text3);font-size:13px">Nuk ka shitje të regjistruara.</div>';
-    } else {
-      if(ctx2.tagName !== 'CANVAS'){
-        ctx2.parentElement.innerHTML = '<canvas id="chart-donut"></canvas>';
-      }
-      const newCtx2 = document.getElementById('chart-donut');
-      donutChart=new Chart(newCtx2,{
-        type:'doughnut',
-        data:{labels:katLabels,datasets:[{data:katData,backgroundColor:colors.slice(0,katLabels.length),borderWidth:3,borderColor:'#fff',hoverOffset:6}]},
-        options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{position:'bottom',labels:{font:{family:'Inter',size:11},boxWidth:10,padding:8}},tooltip:{callbacks:{label:c=>' '+fmtL(c.parsed)}}}}
-      });
-    }
-  }
-
-  // ── Donuti 2: Stoku sipas Kategorisë (vlera = stok × cmb) ──
-  const stokKatMap={};
-  products.forEach(p=>{
-    const k=p.kat||'Tjetër';
-    stokKatMap[k]=(stokKatMap[k]||0)+p.stok*p.cmb;
+  if(!ctx2)return;
+  donutChart=new Chart(ctx2,{
+    type:'doughnut',
+    data:{labels:katLabels,datasets:[{data:katData,backgroundColor:colors.slice(0,katLabels.length),borderWidth:3,borderColor:'#fff',hoverOffset:6}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{position:'bottom',labels:{font:{family:'Inter',size:11},boxWidth:10,padding:8}},tooltip:{callbacks:{label:ctx=>' '+fmtL(ctx.parsed)}}}}
   });
-  const stokKatLabels=Object.keys(stokKatMap);
-  const stokKatData=Object.values(stokKatMap);
-  const colors2=['#8b5cf6','#06b6d4','#f97316','#4f6ef7','#22c55e','#f59e0b','#ef4444'];
-
-  if(stokChart)stokChart.destroy();
-  const ctx3=document.getElementById('chart-stok');
-  if(ctx3){
-    if(!stokKatLabels.length){
-      ctx3.parentElement.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text3);font-size:13px">Nuk ka produkte në inventar.</div>';
-    } else {
-      if(ctx3.tagName !== 'CANVAS'){
-        ctx3.parentElement.innerHTML = '<canvas id="chart-stok"></canvas>';
-      }
-      const newCtx3 = document.getElementById('chart-stok');
-      stokChart=new Chart(newCtx3,{
-        type:'doughnut',
-        data:{labels:stokKatLabels,datasets:[{data:stokKatData,backgroundColor:colors2.slice(0,stokKatLabels.length),borderWidth:3,borderColor:'#fff',hoverOffset:6}]},
-        options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{position:'bottom',labels:{font:{family:'Inter',size:11},boxWidth:10,padding:8}},tooltip:{callbacks:{label:c=>' '+fmtL(c.parsed)+' (vlerë kostoje)'}},title:{display:false}}}
-      });
-    }
-  }
 }
 
 function dashProdSearch(q){
@@ -4582,12 +4192,9 @@ function renderBlerjet(){
             <div style="font-size:11px;color:var(--accent);font-family:'JetBrains Mono',monospace;font-weight:700;margin-top:2px">${b.fat}</div>
             <div style="font-size:11px;color:var(--text3);margin-top:1px">${b.data}</div>
           </div>
-          <div style="text-align:right">
-            <div style="font-size:15px;font-weight:800;color:#4f6ef7">${fmtL(b.sasia*b.cmb)}</div>
-            <div style="margin-top:4px">${statusBadge(getFatureMeta(b.fat).status||'paguar')}</div>
-          </div>
+          <div style="font-size:15px;font-weight:800;color:#4f6ef7">${fmtL(b.sasia*b.cmb)}</div>
         </div>
-        <div style="font-size:12px;color:var(--text2);margin-bottom:.65rem">${p?p.name:(b.name||b.prod)} &nbsp;·&nbsp; Sasia: <b>${b.sasia}</b> &nbsp;·&nbsp; Çmimi: <b>${fmtL(b.cmb)}</b></div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:.65rem">${p?p.name:b.prod} &nbsp;·&nbsp; Sasia: <b>${b.sasia}</b> &nbsp;·&nbsp; Çmimi: <b>${fmtL(b.cmb)}</b></div>
         <div style="display:flex;gap:.4rem">
           <button class="btn btn-outline btn-sm" style="flex:1" onclick="openEditBlerjeModal('${b.id}')">✏ Ndrysho</button>
           <button class="btn btn-danger btn-sm" style="flex:1" onclick="deleteBlerje('${b.id}')">🗑 Fshij</button>
@@ -4599,11 +4206,9 @@ function renderBlerjet(){
 
   // Group by month with separators
   let lastM='';
-  document.getElementById('blerje-head').innerHTML='<tr>'+['Nr. Faturës','Furnitori','Data','Produkti','Sasia','Çm. Blerje','Totali','Statusi',''].map(h=>`<th>${h}</th>`).join('')+'</tr>';
+  document.getElementById('blerje-head').innerHTML='<tr>'+['Nr. Faturës','Furnitori','Data','Produkti','Sasia','Çm. Blerje','Totali',''].map(h=>`<th>${h}</th>`).join('')+'</tr>';
   document.getElementById('blerje-body').innerHTML=pageList.map(b=>{
     const p=getProd(b.prod);
-    const meta=getFatureMeta(b.fat);
-    const status=meta.status||'paguar';
     const thisM=(b.data||'').slice(0,7);
     let sep='';
     if(thisM&&thisM!==lastM){
@@ -4614,9 +4219,8 @@ function renderBlerjet(){
       <td class="mono" style="font-weight:700;color:var(--accent)">${b.fat}</td>
       <td style="font-weight:700;color:var(--text)">${b.furn}</td>
       <td>${b.data}</td>
-      <td>${p?p.name:(b.name||b.prod)}</td><td>${b.sasia}</td><td>${fmtL(b.cmb)}</td>
+      <td>${p?p.name:b.prod}</td><td>${b.sasia}</td><td>${fmtL(b.cmb)}</td>
       <td style="color:#4f6ef7;font-weight:700">${fmtL(b.sasia*b.cmb)}</td>
-      <td>${statusBadge(status)}</td>
       <td style="display:flex;gap:4px">
         <button class="btn btn-outline btn-sm" onclick="openEditBlerjeModal('${b.id}')">✏</button>
         <button class="btn btn-danger btn-sm" onclick="deleteBlerje('${b.id}')">🗑</button>
@@ -5105,45 +4709,31 @@ function renderShpenzimet(){
     </tr>`).join('')||'<tr><td colspan="6" style="color:var(--text3);text-align:center;padding:2rem">Nuk ka shpenzime të regjistruara.</td></tr>';
 }
 
-async function deleteBlerje(id){
+function deleteBlerje(id){
   const b=blerjet.find(x=>x.id===id);
   const prodName=b?((getProd(b.prod)||{}).name||b.prod):'';
   if(!confirm('⚠ Fshi blerjen '+(b?b.fat:id)+(prodName?' — '+prodName:'')+'\nStoku do të ulet automatikisht.'))return;
   if(b){const p=products.find(x=>x.id===b.prod);if(p)p.stok=Math.max(0,p.stok-b.sasia);}
   blerjet=blerjet.filter(x=>x.id!==id);
-  // Fshi direkt nga Supabase
-  try{ await sb.from('blerjet').delete().eq('id',id); }catch(e){console.warn('⚠ Supabase delete blerje:',e);}
   save();renderAll();
 }
 
-async function deleteBlerjeFat(fat){
+function deleteBlerjeFat(fat){
   if(!confirm('Fshi të gjitha blerjet e faturës '+fat+'?'))return;
   const items=blerjet.filter(b=>b.fat===fat);
-  const idsToDelete=items.map(b=>b.id);
   items.forEach(b=>{const p=products.find(x=>x.id===b.prod);if(p)p.stok=Math.max(0,p.stok-b.sasia);});
   blerjet=blerjet.filter(b=>b.fat!==fat);
-  // Fshi direkt nga Supabase
-  if(idsToDelete.length>0){
-    try{ await sb.from('blerjet').delete().in('id',idsToDelete); }catch(e){console.warn('⚠ Supabase delete blerje:',e);}
-  }
-  try{ await sb.from('faturat_meta').delete().eq('fat',fat); }catch(e){console.warn('⚠ Supabase delete meta:',e);}
   save();renderAll();
 }
 
-async function deleteShitje(fat){
+function deleteShitje(fat){
   const meta=faturatMeta[fat]||{};
   const kli=meta.kli||fat;
   if(!confirm('⚠ Fshi shitjen '+fat+' ('+kli+')?\nStoku do të kthehet automatikisht.'))return;
   const items=shitjet.filter(s=>s.fat===fat);
-  const idsToDelete=items.map(s=>s.id);
   items.forEach(s=>{const p=products.find(x=>x.id===s.prod);if(p&&s.pag!=='Preventiv')p.stok+=s.sasia;});
   shitjet=shitjet.filter(s=>s.fat!==fat);
   if(faturatMeta[fat])delete faturatMeta[fat];
-  // Fshi direkt nga Supabase
-  if(idsToDelete.length>0){
-    try{ await sb.from('shitjet').delete().in('id',idsToDelete); }catch(e){console.warn('⚠ Supabase delete shitje:',e);}
-  }
-  try{ await sb.from('faturat_meta').delete().eq('fat',fat); }catch(e){console.warn('⚠ Supabase delete meta:',e);}
   save();renderAll();
 }
 
@@ -5343,8 +4933,10 @@ function buildBackupJSON(){
   return JSON.stringify({
     exportDate: today(),
     exportTime: new Date().toLocaleTimeString('sq-AL'),
-    version: 'HSM Center v3',
-    products, blerjet, shitjet, faturatMeta, arketimet, xhiroHistoriku
+    version: 'HSM Center v3 — Backup i Plotë',
+    products, blerjet, shitjet, shpenzimet, faturatMeta, arketimet,
+    xhiroHistoriku, xhiroDataFunditMbyllje, xhiroTsFundit,
+    users, bizCfg
   }, null, 2);
 }
 
@@ -5360,6 +4952,64 @@ async function doBackup(silent=false){
   URL.revokeObjectURL(a.href);
   if(!silent) alert('✓ Backup u shkarkua: '+filename);
   localStorage.setItem('tp_last_backup', d);
+}
+
+function handleRestoreFile(input){
+  const file = input.files[0];
+  if(!file) return;
+  if(currentRole !== 'admin'){
+    alert('⛔ Vetëm administratori mund të rikthejë një backup!');
+    input.value = '';
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = function(e){
+    let data;
+    try{
+      data = JSON.parse(e.target.result);
+    }catch(err){
+      alert('❌ Skedari i zgjedhur nuk është backup i vlefshëm (.json i dëmtuar).');
+      input.value = '';
+      return;
+    }
+    if(!data || typeof data !== 'object' || !('products' in data && 'shitjet' in data)){
+      alert('❌ Ky skedar nuk duket si backup i HSM Center. Sigurohu që po zgjedh skedarin e duhur (HSMCenter_Backup_....json).');
+      input.value = '';
+      return;
+    }
+    const infoData = `📅 Data e backup-it: ${data.exportDate||'—'}\n🕐 Ora: ${data.exportTime||'—'}\n📦 Produkte: ${(data.products||[]).length}\n🧾 Shitje: ${(data.shitjet||[]).length}\n⬇ Blerje: ${(data.blerjet||[]).length}\n💸 Shpenzime: ${(data.shpenzimet||[]).length}\n👥 Përdorues: ${(data.users||[]).length}\n📋 Mbyllje Xhiro: ${(data.xhiroHistoriku||[]).length}`;
+    if(!confirm(`⚠️ KUJDES! Kjo do të ZËVENDËSOJË TË GJITHA të dhënat aktuale me ato të backup-it:\n\n${infoData}\n\nTë dhënat aktuale (që ke tani në sistem) do të HUMBASIN nëse nuk i ke vetë një backup të ri. Doni të vazhdoni?`)){
+      input.value = '';
+      return;
+    }
+    doRestore(data);
+    input.value = '';
+  };
+  reader.onerror = function(){
+    alert('❌ Gabim gjatë leximit të skedarit.');
+    input.value = '';
+  };
+  reader.readAsText(file);
+}
+
+function doRestore(data){
+  if('products' in data) products = data.products || [];
+  if('blerjet' in data) blerjet = data.blerjet || [];
+  if('shitjet' in data) shitjet = data.shitjet || [];
+  if('shpenzimet' in data) shpenzimet = data.shpenzimet || [];
+  if('faturatMeta' in data) faturatMeta = data.faturatMeta || {};
+  if('arketimet' in data) arketimet = data.arketimet || [];
+  if('xhiroHistoriku' in data) xhiroHistoriku = data.xhiroHistoriku || [];
+  if('xhiroDataFunditMbyllje' in data) xhiroDataFunditMbyllje = data.xhiroDataFunditMbyllje || '';
+  if('xhiroTsFundit' in data) xhiroTsFundit = data.xhiroTsFundit || 0;
+  if('users' in data && Array.isArray(data.users) && data.users.length) users = data.users;
+  if('bizCfg' in data && data.bizCfg) bizCfg = data.bizCfg;
+  save();
+  localStorage.setItem('tp_xhiro_data_fundit', xhiroDataFunditMbyllje);
+  localStorage.setItem('tp_xhiro_ts_fundit', String(xhiroTsFundit));
+  localStorage.setItem('tp_bizcfg', JSON.stringify(bizCfg));
+  renderAll();
+  alert('✅ Backup-i u rikthye me sukses! Çdo e dhënë (produkte, fatura, shitje, blerje, debitorë, shpenzime, përdorues, xhiro, konfigurime) u rifreskua.');
 }
 
 async function autoBackupCheck(){
