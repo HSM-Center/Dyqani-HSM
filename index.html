@@ -515,7 +515,7 @@ select option{background:#fff}
   <button class="nav-btn" id="nav-xhiro" onclick="goTab('Xhiro Ditore',this)" data-tip="Xhiro Ditore"><span class="nav-icon">📋</span><span class="nav-label">Xhiro Ditore</span></button>
   <button class="nav-btn" id="nav-users" onclick="goTab(9,this)" data-tip="Përdoruesit" style="display:none"><span class="nav-icon">👥</span><span class="nav-label">Përdoruesit</span></button>
   <button class="nav-btn" id="nav-cfg" onclick="goTab(10,this)" data-tip="Konfigurimet" style="display:none"><span class="nav-icon">⚙️</span><span class="nav-label">Konfigurimet</span></button>
-  <button class="nav-btn" onclick="doBackup()" data-tip="Backup" style="margin-top:4px"><span class="nav-icon">💾</span><span class="nav-label">Backup Now</span></button>
+  <button class="nav-btn" onclick="doBackup()" data-tip="Backup" style="margin-top:4px"><span class="nav-icon">💾</span><span class="nav-label">Backup Bledi</span></button>
   <button class="nav-btn" onclick="document.getElementById('file-restore').click()" data-tip="Rikthe nga Backup"><span class="nav-icon">📥</span><span class="nav-label">Rikthe Backup</span></button>
   <input type="file" id="file-restore" accept=".json" style="display:none" onchange="handleRestoreFile(this)">
   <div class="sidebar-footer"><span id="sf-bizname">Sistemi</span> v3.0 · <span id="sf-date"></span></div>
@@ -1319,7 +1319,15 @@ select option{background:#fff}
       <div class="form-group" style="grid-column:1/-1"><label>Përshkrimi *</label><input id="sh-pershkrim" placeholder="Psh: Qiraja e muajit Qershor..."></div>
       <div class="form-group"><label>Valuta</label><select id="sh-curr" onchange="updateShpenzimLabel()"><option value="ALL">Lekë (L)</option><option value="EUR">Euro (€)</option></select></div>
       <div class="form-group"><label id="sh-vlera-label">Vlera (L) *</label><input id="sh-vlera" type="number" placeholder="0"></div>
-      <div class="form-group"><label>Paguar nga</label><select id="sh-pag"><option>Cash</option></select></div>
+      <div class="form-group"><label>Mënyra e Pagesës</label><select id="sh-pag" onchange="shTogglePjeserisht()"><option>Cash</option><option>Debitor</option><option>Pjesërisht</option></select></div>
+    </div>
+    <div id="sh-pjeserisht-row" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:1rem;margin-bottom:1rem">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#dc2626;margin-bottom:.75rem">🔴 Pagesa Pjesërisht / Borxh</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem">
+        <div class="form-group" style="margin:0"><label>Paguar Tani (L)</label><input id="sh-paguar" type="number" placeholder="0" oninput="shCalcBorxh()"></div>
+        <div class="form-group" style="margin:0"><label>Borxhi Mbetur (L)</label><input id="sh-borxh" type="number" placeholder="0" readonly style="background:#fef2f2;color:#dc2626;font-weight:700"></div>
+        <div class="form-group" style="margin:0"><label>Afati i Pagesës</label><input id="sh-afat" type="date"></div>
+      </div>
     </div>
     <div class="form-actions">
       <button class="btn btn-outline" onclick="closeModalById('modal-addshpenzim')">Anulo</button>
@@ -4804,6 +4812,21 @@ function renderMagazine(){
   }).join('');
 }
 
+function shTogglePjeserisht(){
+  const v=document.getElementById('sh-pag').value;
+  const row=document.getElementById('sh-pjeserisht-row');
+  row.style.display=(v==='Pjesërisht'||v==='Debitor')?'block':'none';
+  if(v==='Debitor'){document.getElementById('sh-paguar').value='0';shCalcBorxh();}
+}
+
+function shCalcBorxh(){
+  let vlera=+document.getElementById('sh-vlera').value||0;
+  const curr=document.getElementById('sh-curr').value;
+  if(curr==='EUR' && exchangeRateEUR > 0) vlera = vlera * exchangeRateEUR;
+  const paguar=+document.getElementById('sh-paguar').value||0;
+  document.getElementById('sh-borxh').value=Math.max(0,Math.round(vlera-paguar));
+}
+
 function addShpenzim(){
   const kat=document.getElementById('sh-kat').value;
   const pershkrim=document.getElementById('sh-pershkrim').value.trim();
@@ -4812,10 +4835,36 @@ function addShpenzim(){
   const data=document.getElementById('sh-data').value;
   const pag=document.getElementById('sh-pag').value;
   if(!pershkrim||!vlera||!data){alert('Plotëso fushat me yll!');return;}
-  if(curr==='EUR') vlera = vlera * exchangeRateEUR;
-  shpenzimet.push({id:'SH'+Date.now(),data,kat,pershkrim,vlera,pag});
+  
+  const rate = (curr==='EUR' && exchangeRateEUR > 0) ? exchangeRateEUR : 1;
+  const vleraALL = vlera * rate;
+  
+  let status = 'paguar';
+  let paguar = vleraALL;
+  let borxh = 0;
+  let afat = '';
+  
+  if(pag==='Debitor'){
+    status='papaguar'; paguar=0; borxh=vleraALL;
+  } else if(pag==='Pjesërisht'){
+    paguar = (+document.getElementById('sh-paguar').value||0) * rate;
+    borxh = vleraALL - paguar;
+    afat = document.getElementById('sh-afat').value || '';
+    status = borxh > 0 ? 'pjeserisht' : 'paguar';
+  }
+  
+  const shId = 'SH'+Date.now();
+  shpenzimet.push({id:shId,data,kat,pershkrim,vlera:vleraALL,pag});
+  
+  // Regjistrojmë në faturatMeta për arkivin
+  faturatMeta[shId] = {status, paguar, borxh, afat, kli:'FURNIZUES (SHPENZIM)', data, valuta:curr, tvshOpt:'jo'};
+  
   save();closeModalById('modal-addshpenzim');renderAll();
-  ['sh-pershkrim','sh-vlera'].forEach(x=>document.getElementById(x).value='');
+  ['sh-pershkrim','sh-vlera','sh-paguar','sh-borxh','sh-afat'].forEach(x=>{
+    const el=document.getElementById(x); if(el) el.value='';
+  });
+  document.getElementById('sh-pag').value='Cash';
+  document.getElementById('sh-pjeserisht-row').style.display='none';
 }
 
 function renderShpenzimet(){
@@ -5428,7 +5477,7 @@ function buildFatureHTML(d){
     paguar:    ['#dcfce7','#16a34a','✓ PAGUAR PLOTËSISHT'],
     papaguar:  ['#fee2e2','#dc2626','✗ PA PAGUAR'],
     pjeserisht:['#ede9fe','#7c3aed','◑ PAGUAR PJESËRISHT'],
-    preventiv: ['#fef3c7','#d97706','PREVENTIV / OFERTË']
+    preventiv: ['#fef3c7','#d97706','OFERTË ÇMIMI']
   };
   const [sc,stc,stxt] = stampColors[status] || stampColors.paguar;
 
@@ -5445,7 +5494,7 @@ function buildFatureHTML(d){
 
   const prevNote = isPrev ? `
     <div style="margin:0 2.5rem 1.5rem;background:#fffbeb;border-left:3px solid #d97706;padding:10px 16px;border-radius:0 6px 6px 0;font-size:12px;color:#92400e;line-height:1.6">
-      <strong>Vlerësim Çmimi</strong> — Ky dokument është një PREVENTIV (ofertë çmimi) dhe nuk ka vlerë tatimore.
+      <strong>Ofertë Çmimi</strong> — Ky dokument shërben si informacion mbi vlerat e produkteve/shërbimeve të kërkuara.
     </div>` : '';
 
   const kursiHTML = (curr !== 'ALL') ? `
@@ -5472,7 +5521,7 @@ function buildFatureHTML(d){
         </div>
       </div>
       <div style="text-align:right">
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.16em;color:rgba(255,255,255,0.6);margin-bottom:6px">${isPrev?'PREVENTIV / INVOICE':'FATURË / INVOICE'}</div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.16em;color:rgba(255,255,255,0.6);margin-bottom:6px">${isPrev?'OFERTË / QUOTATION':'FATURË / INVOICE'}</div>
         <div style="font-size:20px;font-weight:800;color:#ffffff;letter-spacing:-.01em">${d.fat}</div>
         <div style="font-size:12.5px;color:rgba(255,255,255,0.75);margin-top:6px;font-weight:500">Data: ${d.data}</div>
       </div>
@@ -5700,7 +5749,7 @@ function exportPDF(){
   doc.setFillColor(26,107,138);doc.rect(pw/2-1,0,pw/2+1,30,'F');
   doc.setTextColor(255,255,255);doc.setFontSize(16);doc.setFont('helvetica','bold');doc.text(bizCfg.emri,14,13);
   doc.setFontSize(8);doc.setFont('helvetica','normal');doc.text([bizCfg.adresa,bizCfg.nipt?'NIPT: '+bizCfg.nipt:'',bizCfg.tel?'Tel: '+bizCfg.tel:''].filter(Boolean).join('  ·  '),14,21);
-  doc.setFontSize(8);doc.setTextColor(200,230,255);doc.text(isPrev?'PREVENTIV / INVOICE':'FATURË / INVOICE',pw-14,11,{align:'right'});
+  doc.setFontSize(8);doc.setTextColor(200,230,255);doc.text(isPrev?'OFERTË / QUOTATION':'FATURË / INVOICE',pw-14,11,{align:'right'});
   doc.setFontSize(16);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);doc.text(d.fat,pw-14,22,{align:'right'});
 
   // KLIENTI + DATA
