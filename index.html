@@ -1,3 +1,48 @@
+
+
+Inizia la prova gratuita
+
+Condividi
+me fal tek shpenzimet 
+Data	Kategoria	Përshkrimi	Vlera	Pagesa	
+2026-06-23	Qiraja	111	111.00 L	Cash
+✏
+🗑 pse edit nuk ben te besh psh debitor, por ngel vetem cash
+Lite
+Më falni për këtë harresë. Keni të drejtë, ndërsa modifikova formën për shtimin e shpenzimeve të reja, harrova të përditësoja edhe dritaren e modifikimit (edit).
+Do ta rregulloj tani në mënyrë që edhe kur modifikoni një shpenzim ekzistues:
+Të keni mundësi të zgjidhni Debitor ose Pjesërisht.
+Të shfaqen fushat për pagesën dhe borxhin, njësoj si te shtimi.
+Po e bëj këtë ndryshim menjëherë.
+
+
+Lite
+Rregullova edhe dritaren e editimit të shpenzimeve.
+Tani, kur klikoni mbi ikonën e lapsit (edit) për një shpenzim:
+Mund të ndryshoni mënyrën e pagesës në Debitor ose Pjesërisht.
+Do të shfaqen automatikisht fushat për të vendosur shumën e paguar dhe borxhin mbetur.
+Të dhënat do të përditësohen saktë edhe në arkivin e faturave.
+Mund ta shkarkoni skedarin e fundit më poshtë.
+index-2026-06-23T134500.374.html
+Codice · 324.52 KB
+Visualizza tutti i file di questo compito
+Attività completata
+Com'è stato questo risultato?
+Suggerimenti per ulteriori approfondimenti
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistemi i Menaxhimit</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></
+
+
+
+
+Manus is an AI Agent and can make mistakes. Please double-check before use.
+
+index-2026-06-23T134500.374.html
 <!DOCTYPE html>
 <html lang="sq">
 <head>
@@ -1347,7 +1392,15 @@ select option{background:#fff}
       </select></div>
       <div class="form-group" style="grid-column:1/-1"><label>Përshkrimi *</label><input id="esh-pershkrim" placeholder="Përshkrimi..."></div>
       <div class="form-group"><label>Vlera (L) *</label><input id="esh-vlera" type="number" placeholder="0"></div>
-      <div class="form-group"><label>Paguar nga</label><select id="esh-pag"><option>Cash</option></select></div>
+      <div class="form-group"><label>Mënyra e Pagesës</label><select id="esh-pag" onchange="eshTogglePjeserisht()"><option>Cash</option><option>Debitor</option><option>Pjesërisht</option></select></div>
+    </div>
+    <div id="esh-pjeserisht-row" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:1rem;margin-bottom:1rem">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#dc2626;margin-bottom:.75rem">🔴 Pagesa Pjesërisht / Borxh</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem">
+        <div class="form-group" style="margin:0"><label>Paguar (L)</label><input id="esh-paguar" type="number" placeholder="0" oninput="eshCalcBorxh()"></div>
+        <div class="form-group" style="margin:0"><label>Borxhi Mbetur (L)</label><input id="esh-borxh" type="number" placeholder="0" readonly style="background:#fef2f2;color:#dc2626;font-weight:700"></div>
+        <div class="form-group" style="margin:0"><label>Afati i Pagesës</label><input id="esh-afat" type="date"></div>
+      </div>
     </div>
     <div class="form-actions">
       <button class="btn btn-outline" onclick="closeModalById('modal-editshpenzim')">Anulo</button>
@@ -4917,6 +4970,19 @@ function deleteShitje(fat){
   save();renderAll();
 }
 
+function eshTogglePjeserisht(){
+  const v=document.getElementById('esh-pag').value;
+  const row=document.getElementById('esh-pjeserisht-row');
+  row.style.display=(v==='Pjesërisht'||v==='Debitor')?'block':'none';
+  if(v==='Debitor'){document.getElementById('esh-paguar').value='0';eshCalcBorxh();}
+}
+
+function eshCalcBorxh(){
+  const vlera=+document.getElementById('esh-vlera').value||0;
+  const paguar=+document.getElementById('esh-paguar').value||0;
+  document.getElementById('esh-borxh').value=Math.max(0,Math.round(vlera-paguar));
+}
+
 function openEditShpenzimModal(id){
   const s=shpenzimet.find(x=>x.id===id);if(!s)return;
   document.getElementById('esh-id').value=id;
@@ -4925,17 +4991,51 @@ function openEditShpenzimModal(id){
   document.getElementById('esh-pershkrim').value=s.pershkrim;
   document.getElementById('esh-vlera').value=s.vlera;
   document.getElementById('esh-pag').value=s.pag;
+  
+  const m = faturatMeta[id] || {};
+  if(s.pag==='Pjesërisht' || s.pag==='Debitor'){
+    document.getElementById('esh-pjeserisht-row').style.display='block';
+    document.getElementById('esh-paguar').value=m.paguar||0;
+    document.getElementById('esh-borxh').value=m.borxh||0;
+    document.getElementById('esh-afat').value=m.afat||'';
+  } else {
+    document.getElementById('esh-pjeserisht-row').style.display='none';
+  }
+  
   document.getElementById('modal-editshpenzim').classList.add('open');
 }
 
 function saveEditShpenzim(){
   const id=document.getElementById('esh-id').value;
   const idx=shpenzimet.findIndex(x=>x.id===id);if(idx===-1)return;
-  shpenzimet[idx].data=document.getElementById('esh-data').value;
-  shpenzimet[idx].kat=document.getElementById('esh-kat').value;
-  shpenzimet[idx].pershkrim=document.getElementById('esh-pershkrim').value.trim();
-  shpenzimet[idx].vlera=+document.getElementById('esh-vlera').value;
-  shpenzimet[idx].pag=document.getElementById('esh-pag').value;
+  const data=document.getElementById('esh-data').value;
+  const kat=document.getElementById('esh-kat').value;
+  const pershkrim=document.getElementById('esh-pershkrim').value.trim();
+  const vlera=+document.getElementById('esh-vlera').value;
+  const pag=document.getElementById('esh-pag').value;
+  
+  shpenzimet[idx].data=data;
+  shpenzimet[idx].kat=kat;
+  shpenzimet[idx].pershkrim=pershkrim;
+  shpenzimet[idx].vlera=vlera;
+  shpenzimet[idx].pag=pag;
+  
+  let status = 'paguar';
+  let paguar = vlera;
+  let borxh = 0;
+  let afat = '';
+  
+  if(pag==='Debitor'){
+    status='papaguar'; paguar=0; borxh=vlera;
+  } else if(pag==='Pjesërisht'){
+    paguar = +document.getElementById('esh-paguar').value||0;
+    borxh = vlera - paguar;
+    afat = document.getElementById('esh-afat').value || '';
+    status = borxh > 0 ? 'pjeserisht' : 'paguar';
+  }
+  
+  faturatMeta[id] = {status, paguar, borxh, afat, kli:'FURNIZUES (SHPENZIM)', data, valuta:'ALL', tvshOpt:'jo'};
+  
   save();closeModalById('modal-editshpenzim');renderAll();
 }
 
@@ -5986,3 +6086,4 @@ window.addEventListener('resize', initMobile);
 </script>
 </body>
 </html>
+Problemi me hapjen e search pas shtimit të produktit - Manus
