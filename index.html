@@ -1,48 +1,3 @@
-
-
-Inizia la prova gratuita
-
-Condividi
-me fal tek shpenzimet 
-Data	Kategoria	Përshkrimi	Vlera	Pagesa	
-2026-06-23	Qiraja	111	111.00 L	Cash
-✏
-🗑 pse edit nuk ben te besh psh debitor, por ngel vetem cash
-Lite
-Më falni për këtë harresë. Keni të drejtë, ndërsa modifikova formën për shtimin e shpenzimeve të reja, harrova të përditësoja edhe dritaren e modifikimit (edit).
-Do ta rregulloj tani në mënyrë që edhe kur modifikoni një shpenzim ekzistues:
-Të keni mundësi të zgjidhni Debitor ose Pjesërisht.
-Të shfaqen fushat për pagesën dhe borxhin, njësoj si te shtimi.
-Po e bëj këtë ndryshim menjëherë.
-
-
-Lite
-Rregullova edhe dritaren e editimit të shpenzimeve.
-Tani, kur klikoni mbi ikonën e lapsit (edit) për një shpenzim:
-Mund të ndryshoni mënyrën e pagesës në Debitor ose Pjesërisht.
-Do të shfaqen automatikisht fushat për të vendosur shumën e paguar dhe borxhin mbetur.
-Të dhënat do të përditësohen saktë edhe në arkivin e faturave.
-Mund ta shkarkoni skedarin e fundit më poshtë.
-index-2026-06-23T134500.374.html
-Codice · 324.52 KB
-Visualizza tutti i file di questo compito
-Attività completata
-Com'è stato questo risultato?
-Suggerimenti per ulteriori approfondimenti
-<!DOCTYPE html>
-<html lang="sq">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sistemi i Menaxhimit</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></
-
-
-
-
-Manus is an AI Agent and can make mistakes. Please double-check before use.
-
-index-2026-06-23T134500.374.html
 <!DOCTYPE html>
 <html lang="sq">
 <head>
@@ -138,23 +93,23 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .content{padding:1.5rem 1.75rem;flex:1}
 .page{display:none}.page.active{display:block}
 .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:1.5rem}
-.kpi{background:#fff;border-radius:14px;padding:1.25rem 1.5rem;box-shadow:var(--shadow);display:flex;align-items:flex-start;gap:1rem;position:relative;overflow:hidden;border:1px solid var(--border)}
-.kpi::after{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.kpi{background:#fff;border-radius:16px;padding:1.35rem 1.5rem;box-shadow:0 2px 8px rgba(0,0,0,.09),0 1px 3px rgba(0,0,0,.06);display:flex;align-items:flex-start;gap:1rem;position:relative;overflow:hidden;border:1px solid var(--border)}
+.kpi::after{content:'';position:absolute;top:0;left:0;right:0;height:4px}
 .kpi.blue::after{background:linear-gradient(90deg,#4f6ef7,#7c5cfc)}
 .kpi.green::after{background:linear-gradient(90deg,#22c55e,#16a34a)}
 .kpi.amber::after{background:linear-gradient(90deg,#f59e0b,#d97706)}
 .kpi.red::after{background:linear-gradient(90deg,#ef4444,#dc2626)}
 .kpi.purple::after{background:linear-gradient(90deg,#8b5cf6,#6d28d9)}
-.kpi-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.kpi-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
 .kpi.blue .kpi-icon{background:#eff2fe}
 .kpi.green .kpi-icon{background:#f0fdf4}
 .kpi.amber .kpi-icon{background:#fffbeb}
 .kpi.red .kpi-icon{background:#fef2f2}
 .kpi.purple .kpi-icon{background:#f5f3ff}
 .kpi-body{flex:1;min-width:0}
-.kpi-val{font-size:24px;font-weight:800;letter-spacing:-1px;color:var(--text);line-height:1.1}
-.kpi-lbl{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-top:4px;font-weight:500}
-.kpi-trend{font-size:11px;margin-top:6px;font-weight:600}
+.kpi-val{font-size:26px;font-weight:800;letter-spacing:-1px;color:#0f172a;line-height:1.1}
+.kpi-lbl{font-size:12px;color:#64748b;text-transform:uppercase;letter-spacing:.08em;margin-top:5px;font-weight:600}
+.kpi-trend{font-size:12px;margin-top:7px;font-weight:600}
 .kpi-trend.up{color:var(--success)}.kpi-trend.down{color:var(--danger)}
 .charts-row{display:grid;grid-template-columns:2fr 1fr;gap:1rem;margin-bottom:1.5rem}
 .chart-card{background:#fff;border-radius:16px;padding:1.5rem 1.75rem;box-shadow:var(--shadow-md);border:1px solid var(--border)}
@@ -201,7 +156,61 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .stok-ok{background:#f0fdf4;color:#16a34a}
 .stok-low{background:#fef2f2;color:#dc2626}
 .prod-card-marzha{font-size:11px;color:var(--text3)}
-.prod-card-low-badge{position:absolute;top:8px;right:8px;background:#ef4444;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px}
+	.prod-card-low-badge{position:absolute;top:8px;right:8px;background:#ef4444;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px}
+	
+	/* Dizajni i ri për PREVENTIVIN */
+		.fature-wrapper.preventiv-theme {
+		  border: 2px solid #334155 !important;
+		  border-top: 15px solid #334155 !important;
+		  position: relative;
+		  overflow: hidden;
+		}
+		.preventiv-theme .fature-header {
+		  background: #fff !important;
+		  border-bottom: 2px solid #334155 !important;
+		  padding: 1.5rem 2.5rem !important;
+		}
+		.preventiv-theme .fature-header * {
+		  color: #334155 !important;
+		}
+		.preventiv-theme .fature-header img {
+		  filter: none !important;
+		}
+		.preventiv-theme .preventiv-label {
+		  display: block;
+		  background: #334155;
+		  color: #fff !important;
+		  padding: 8px 20px;
+		  font-size: 24px;
+		  font-weight: 900;
+		  text-align: center;
+		  text-transform: uppercase;
+		  letter-spacing: 5px;
+		  margin: -1.5rem -2.5rem 1.5rem -2.5rem;
+		}
+		.preventiv-theme .watermark {
+		  position: absolute;
+		  top: 50%;
+		  left: 50%;
+		  transform: translate(-50%, -50%) rotate(-30deg);
+		  font-size: 100px;
+		  font-weight: 900;
+		  color: rgba(51, 65, 85, 0.05);
+		  pointer-events: none;
+		  white-space: nowrap;
+		  z-index: 0;
+		  text-transform: uppercase;
+		  letter-spacing: 15px;
+		}
+		.preventiv-theme th {
+		  background: #f1f5f9 !important;
+		  color: #334155 !important;
+		  border-bottom: 2px solid #334155 !important;
+		}
+		.preventiv-theme .total-row {
+		  background: #f8fafc !important;
+		  border-top: 2px solid #334155 !important;
+		}
 .prod-card-kat{position:absolute;top:8px;left:8px;background:#fff;color:var(--text2);font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;box-shadow:var(--shadow)}
 .prod-list-view{display:none}
 .prod-list-view.show{display:block}
@@ -369,12 +378,12 @@ select option{background:#fff}
   .content{padding:.75rem .65rem 90px!important}
 
   /* ── KPI cards ── */
-  .kpi-grid{grid-template-columns:1fr 1fr!important;gap:.5rem!important}
-  .kpi{padding:.75rem .85rem!important;gap:.55rem!important}
-  .kpi-val{font-size:16px!important;letter-spacing:-.5px!important}
-  .kpi-icon{width:36px!important;height:36px!important;font-size:17px!important}
-  .kpi-lbl{font-size:9px!important;letter-spacing:.04em!important}
-  .kpi-trend{font-size:10px!important}
+  .kpi-grid{grid-template-columns:1fr 1fr!important;gap:.6rem!important}
+  .kpi{padding:.9rem 1rem!important;gap:.6rem!important}
+  .kpi-val{font-size:18px!important;letter-spacing:-.5px!important}
+  .kpi-icon{width:38px!important;height:38px!important;font-size:18px!important}
+  .kpi-lbl{font-size:10px!important;letter-spacing:.04em!important}
+  .kpi-trend{font-size:11px!important}
 
   /* ── Charts ── */
   .charts-row{grid-template-columns:1fr!important}
@@ -497,6 +506,41 @@ select option{background:#fff}
   .fat-parties{grid-template-columns:1fr!important;gap:.75rem!important}
   .fat-totals{justify-content:flex-start!important}
   .fat-totals-inner{min-width:100%!important}
+  /* ── Modal Preventiv header fix ── */
+  #modal-preventiv .modal-box{width:100%!important;max-width:100%!important}
+  #prev-doc-header{
+    grid-template-columns:1fr!important;
+    gap:.75rem!important;
+    padding:1rem!important
+  }
+  #prev-doc-header [style*="text-align:right"]{text-align:left!important}
+  #prev-doc-header [style*="display:grid"]{justify-content:flex-start!important}
+  #prev-doc-header [style*="PREVENTIV"]{font-size:14px!important;letter-spacing:2px!important;padding:4px 14px!important}
+  #modal-preventiv #prev-hdr-bizname{font-size:14px!important}
+  #modal-preventiv [style*="grid-template-columns:1.4fr 1fr 1.4fr"]{
+    grid-template-columns:1fr 1fr!important;
+    gap:.5rem!important
+  }
+  #modal-preventiv [style*="grid-template-columns:2.5fr 1.2fr"]{
+    grid-template-columns:1fr!important;
+    gap:.5rem!important
+  }
+  #modal-preventiv [style*="padding:1.25rem 1.75rem"]{padding:.75rem 1rem!important}
+  #modal-preventiv [style*="margin:1.25rem 1.75rem"]{margin:.75rem 1rem!important}
+  #modal-preventiv [style*="margin:0 1.75rem"]{margin:0 1rem!important}
+  #modal-preventiv .form-actions{padding:.75rem 1rem!important;flex-wrap:wrap!important}
+  #modal-preventiv .form-actions .btn{flex:1!important;min-width:120px!important;text-align:center!important;justify-content:center!important}
+  /* ── Fatura/Preventiv print totalet plotesisht ne mobile ── */
+  #fat-print-body .fature-header{grid-template-columns:1fr!important;gap:.75rem!important;padding:1rem!important}
+  #fat-print-body .fature-header [style*="text-align:right"]{text-align:left!important}
+  #fat-print-body [style*="justify-content:flex-end"]{justify-content:stretch!important;display:block!important}
+  #fat-print-body [style*="min-width:240px"]{min-width:unset!important;width:100%!important;max-width:100%!important}
+  #fat-print-body [style*="padding:0 2.5rem"]{padding-left:1rem!important;padding-right:1rem!important}
+  #fat-print-body [style*="padding:1.4rem 2.5rem"]{padding-left:1rem!important;padding-right:1rem!important}
+  #fat-print-body [style*="padding:2.2rem 2.5rem"]{padding:1.2rem 1rem!important}
+  #fat-print-body [style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr!important}
+  .fature-wrapper{max-width:100%!important}
+  .fature-footer [style*="justify-content:space-between"]{flex-direction:column!important;gap:4px!important}
 }
 </style>
 </head>
@@ -528,6 +572,9 @@ select option{background:#fff}
     </div>
     <div class="login-err" id="login-err">❌ Emri ose fjalëkalimi është i gabuar.</div>
     <button class="login-submit" onclick="doLogin()">🔓 Hyr në Sistem</button>
+    <div style="text-align:center;margin-top:1rem">
+      <button onclick="resetAdminPass()" style="background:none;border:none;color:rgba(255,255,255,.35);font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;text-decoration:underline">Rivendos fjalëkalimin e adminit</button>
+    </div>
   </div>
 </div>
 
@@ -545,6 +592,7 @@ select option{background:#fff}
   <button class="nav-btn active" onclick="goTab(0,this)" data-tip="Dashboard"><span class="nav-icon">📊</span><span class="nav-label">Dashboard</span></button>
   <button class="nav-btn" onclick="openShitjeModalDirect(this)" data-tip="Shitje e Re" style="background:linear-gradient(90deg,#22c55e22,#16a34a11);color:#16a34a;font-weight:700"><span class="nav-icon">🛒</span><span class="nav-label">Shitje e Re</span></button>
   <button class="nav-btn" onclick="openServisModalDirect(this)" data-tip="Servis i Ri" style="background:linear-gradient(90deg,#0284c722,#0369a111);color:#0284c7;font-weight:700"><span class="nav-icon">🔧</span><span class="nav-label">Servis i Ri</span></button>
+  <button class="nav-btn" onclick="openPreventivModal()" data-tip="Ofertë (Preventiv)" style="background:linear-gradient(90deg,#0891b222,#0e749111);color:#0891b2;font-weight:700"><span class="nav-icon">📝</span><span class="nav-label">Ofertë (Preventiv)</span></button>
   <button class="nav-btn" id="sidebar-blerje-btn" onclick="openModal('modal-addblerje')" data-tip="Blerje e Re" style="background:linear-gradient(90deg,#f59e0b22,#d9770611);color:#d97706;font-weight:700;display:none"><span class="nav-icon">⬇</span><span class="nav-label">Blerje e Re</span></button>
   <div class="nav-section">Magazina</div>
   <button class="nav-btn" onclick="goTab(1,this)" data-tip="Produktet"><span class="nav-icon">📦</span><span class="nav-label">Produktet</span></button>
@@ -560,7 +608,7 @@ select option{background:#fff}
   <button class="nav-btn" id="nav-xhiro" onclick="goTab('Xhiro Ditore',this)" data-tip="Xhiro Ditore"><span class="nav-icon">📋</span><span class="nav-label">Xhiro Ditore</span></button>
   <button class="nav-btn" id="nav-users" onclick="goTab(9,this)" data-tip="Përdoruesit" style="display:none"><span class="nav-icon">👥</span><span class="nav-label">Përdoruesit</span></button>
   <button class="nav-btn" id="nav-cfg" onclick="goTab(10,this)" data-tip="Konfigurimet" style="display:none"><span class="nav-icon">⚙️</span><span class="nav-label">Konfigurimet</span></button>
-  <button class="nav-btn" onclick="doBackup()" data-tip="Backup" style="margin-top:4px"><span class="nav-icon">💾</span><span class="nav-label">Backup Now</span></button>
+  <button class="nav-btn" onclick="doBackup()" data-tip="Backup" style="margin-top:4px"><span class="nav-icon">💾</span><span class="nav-label">Backup Tani</span></button>
   <button class="nav-btn" onclick="document.getElementById('file-restore').click()" data-tip="Rikthe nga Backup"><span class="nav-icon">📥</span><span class="nav-label">Rikthe Backup</span></button>
   <input type="file" id="file-restore" accept=".json" style="display:none" onchange="handleRestoreFile(this)">
   <div class="sidebar-footer"><span id="sf-bizname">Sistemi</span> v3.0 · <span id="sf-date"></span></div>
@@ -601,9 +649,10 @@ select option{background:#fff}
 
     <div class="page active" id="tab-0">
       <div style="margin-bottom:1rem;display:flex;gap:.75rem;flex-wrap:wrap">
-        <button class="btn btn-primary" id="dash-shitje-toggle-btn" onclick="toggleInlineShitje()" style="background:linear-gradient(135deg,#22c55e,#16a34a);border-color:#16a34a;font-size:14px;padding:10px 22px">🛒 Shitje e Re</button>
-        <button class="btn btn-primary" onclick="openServisModalDirect()" style="background:linear-gradient(135deg,#0284c7,#0369a1);border-color:#0369a1;font-size:14px;padding:10px 22px">🔧 Servis i Ri</button>
-        <button class="btn btn-primary" id="dash-blerje-btn" onclick="openModal('modal-addblerje')" style="display:none;background:linear-gradient(135deg,#f59e0b,#d97706);border-color:#d97706;font-size:14px;padding:10px 22px">⬇ Blerje e Re</button>
+        <button class="btn btn-primary" id="dash-shitje-toggle-btn" onclick="toggleInlineShitje()" style="background:linear-gradient(135deg,#22c55e,#16a34a);border-color:#16a34a;font-size:14px;padding:10px 22px;color:#fef9c3;font-weight:800;letter-spacing:.01em">🛒 Shitje e Re</button>
+        <button class="btn btn-primary" onclick="openServisModalDirect()" style="background:linear-gradient(135deg,#0284c7,#0369a1);border-color:#0369a1;font-size:14px;padding:10px 22px;color:#fef9c3;font-weight:800;letter-spacing:.01em">🔧 Servis i Ri</button>
+        <button class="btn btn-primary" onclick="openPreventivModal()" style="background:linear-gradient(135deg,#0891b2,#0e7490);border-color:#0e7490;font-size:14px;padding:10px 22px;color:#fff;font-weight:800;letter-spacing:.01em">📝 Ofertë / Preventiv</button>
+        <button class="btn btn-primary" id="dash-blerje-btn" onclick="openModal('modal-addblerje')" style="display:none;background:linear-gradient(135deg,#f59e0b,#d97706);border-color:#d97706;font-size:14px;padding:10px 22px;color:#1c1917;font-weight:800">⬇ Blerje e Re</button>
         <button class="btn btn-outline" onclick="goToDebitoret()">👤 Debitorët</button>
       </div>
 
@@ -619,7 +668,7 @@ select option{background:#fff}
           <div class="form-group"><label>Nr. Faturës (Opsionale)</label><div style="display:flex;gap:6px;align-items:center"><input id="ds-fat" placeholder="F-SH-001" style="flex:1"><button type="button" onclick="document.getElementById('ds-fat').value=nextFatNr('sh')" title="Gjenero automatikisht" style="background:linear-gradient(135deg,#4f6ef7,#7c5cfc);border:none;color:#fff;border-radius:8px;padding:0 10px;font-size:16px;cursor:pointer;height:40px;flex-shrink:0">🔄</button></div></div>
           <div class="form-group"><label>Data *</label><input id="ds-data" type="date"></div>
           <div class="form-group"><label>Klienti (Opsionale)</label><input id="ds-kli" value="Klient" placeholder="Emri klientit"></div>
-          <div class="form-group"><label>Mënyra Pagesës</label><select id="ds-pag" onchange="dsTogglePjeserisht()"><option>Cash</option><option>Debitor</option><option>Pjesërisht</option><option>Preventiv</option></select></div>
+          <div class="form-group"><label>Mënyra Pagesës</label><select id="ds-pag" onchange="dsTogglePjeserisht()"><option>Cash</option><option>Debitor</option><option>Pjesërisht</option></select></div>
           <div class="form-group"><label>Valuta</label><select id="ds-curr" onchange="dsUpdateLabels()"><option value="ALL">Lekë (L)</option><option value="EUR">Euro (€)</option></select></div>
           <div class="form-group"><label>TVSH (20%)</label><select id="ds-tvsh-opt" onchange="dsRenderCart()"><option value="po">Po</option><option value="jo">Jo</option></select></div>
         </div>
@@ -682,6 +731,8 @@ select option{background:#fff}
       </div>
 
       <div class="kpi-grid" id="dash-kpi"></div>
+
+
 
       <div class="card" style="margin-bottom:1rem;padding:1.25rem 1.5rem">
         <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:.75rem">🔍 Kërko Produkt</div>
@@ -1244,6 +1295,127 @@ select option{background:#fff}
   </div>
 </div>
 
+<div class="modal-overlay" id="modal-preventiv">
+  <div class="modal-box preventiv-theme" style="width:960px;max-width:98vw;max-height:92vh;overflow-y:auto;display:flex;flex-direction:column;border-radius:18px;box-shadow:0 24px 64px rgba(0,0,0,.28)">
+
+    <!-- TOP BAR: titull modal + butonat mbyll/minimizo -->
+    <div class="modal-header" style="flex-shrink:0;background:#0f172a;border-radius:18px 18px 0 0;padding:1rem 1.5rem;border-bottom:none">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:15px">📝</span>
+        <span style="font-size:14px;font-weight:700;color:#e2e8f0">Ofertë / Preventiv</span>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center">
+        <button class="modal-close" title="Maksimizo" onclick="toggleMaximize('modal-preventiv',this)" style="background:rgba(255,255,255,.1);color:#94a3b8">□</button>
+        <button class="modal-close" title="Minimizo" onclick="minimizeModal('modal-preventiv','📝 Preventiv')" style="background:rgba(255,255,255,.1);color:#94a3b8">—</button>
+        <button class="modal-close" title="Mbyll" onclick="closeModalById('modal-preventiv');document.removeEventListener('click',closeProdDropdownPrev,true)" style="background:rgba(239,68,68,.25);color:#fca5a5">×</button>
+      </div>
+    </div>
+
+    <div style="flex:1;overflow-y:auto;background:#fff">
+
+      <!-- DOCUMENT HEADER: struktura si faturë zyrtare -->
+      <div id="prev-doc-header" style="background:#1e293b;padding:1.5rem 2rem;display:grid;grid-template-columns:1fr auto;gap:1.5rem;align-items:start">
+
+        <!-- E majta: emri biznesi + adresa (dinamike) -->
+        <div>
+          <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem">Lëshuar nga</div>
+          <div id="prev-hdr-bizname" style="font-size:18px;font-weight:900;color:#f8fafc;letter-spacing:-.3px;line-height:1.2">—</div>
+          <div id="prev-hdr-adresa" style="font-size:12px;color:#94a3b8;margin-top:.3rem;line-height:1.6">—</div>
+          <div id="prev-hdr-nipt" style="font-size:11px;color:#64748b;margin-top:.2rem;font-family:'JetBrains Mono',monospace"></div>
+        </div>
+
+        <!-- E djathta: PREVENTIV + nr + datë -->
+        <div style="text-align:right">
+          <div style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#1c1917;font-size:20px;font-weight:900;letter-spacing:5px;text-transform:uppercase;padding:6px 20px;border-radius:8px;display:inline-block;margin-bottom:.75rem">PREVENTIV</div>
+          <div style="display:grid;grid-template-columns:auto auto;gap:.3rem .75rem;text-align:right;margin-top:.4rem">
+            <span style="font-size:11px;color:#64748b;font-weight:600;text-align:right">Nr. Oferte:</span>
+            <span id="prev-hdr-nr" style="font-size:12px;color:#f1f5f9;font-weight:800;font-family:'JetBrains Mono',monospace">—</span>
+            <span style="font-size:11px;color:#64748b;font-weight:600;text-align:right">Data:</span>
+            <span id="prev-hdr-data" style="font-size:12px;color:#f1f5f9;font-weight:700">—</span>
+            <span style="font-size:11px;color:#64748b;font-weight:600;text-align:right">Klienti:</span>
+            <span id="prev-hdr-kli" style="font-size:12px;color:#fbbf24;font-weight:800">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- FORM FIELDS -->
+      <div style="padding:1.25rem 1.75rem .75rem;background:#f8fafc;border-bottom:2px solid #e2e8f0">
+        <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.75rem">Të Dhënat e Ofertës</div>
+        <div style="display:grid;grid-template-columns:1.4fr 1fr 1.4fr .8fr .8fr;gap:.75rem;align-items:end">
+          <div class="form-group" style="margin:0">
+            <label style="font-size:11px;font-weight:700;color:#334155;display:block;margin-bottom:4px">Nr. Oferte</label>
+            <div style="display:flex;gap:5px">
+              <input id="prev-fat" placeholder="PREV-001" oninput="updatePrevHeader()" style="flex:1;border:2px solid #e2e8f0;border-radius:9px;padding:9px 11px;font-size:13px;font-family:'JetBrains Mono',monospace;color:#1e293b;font-weight:700;outline:none;transition:border-color .2s" onfocus="this.style.borderColor='#334155'" onblur="this.style.borderColor='#e2e8f0'">
+              <button type="button" onclick="document.getElementById('prev-fat').value='PREV-'+Date.now().toString().slice(-6);updatePrevHeader()" title="Gjenero" style="background:#334155;border:none;color:#fff;border-radius:8px;padding:0 10px;font-size:14px;cursor:pointer;height:40px;flex-shrink:0">🔄</button>
+            </div>
+          </div>
+          <div class="form-group" style="margin:0">
+            <label style="font-size:11px;font-weight:700;color:#334155;display:block;margin-bottom:4px">Data *</label>
+            <input id="prev-data" type="date" oninput="updatePrevHeader()" style="border:2px solid #e2e8f0;border-radius:9px;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif;color:#1e293b;font-weight:600;outline:none;width:100%" onfocus="this.style.borderColor='#334155'" onblur="this.style.borderColor='#e2e8f0'">
+          </div>
+          <div class="form-group" style="margin:0">
+            <label style="font-size:11px;font-weight:700;color:#334155;display:block;margin-bottom:4px">Klienti</label>
+            <input id="prev-kli" value="Klient" placeholder="Emri klientit" oninput="updatePrevHeader()" style="border:2px solid #e2e8f0;border-radius:9px;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif;color:#1e293b;font-weight:600;outline:none;width:100%" onfocus="this.style.borderColor='#334155'" onblur="this.style.borderColor='#e2e8f0'">
+          </div>
+          <div class="form-group" style="margin:0">
+            <label style="font-size:11px;font-weight:700;color:#334155;display:block;margin-bottom:4px">Valuta</label>
+            <select id="prev-curr" onchange="updatePrevLabels()" style="border:2px solid #e2e8f0;border-radius:9px;padding:9px 10px;font-size:13px;font-family:'Inter',sans-serif;color:#1e293b;font-weight:600;outline:none;width:100%;background:#fff">
+              <option value="ALL">Lekë (L)</option><option value="EUR">Euro (€)</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin:0">
+            <label style="font-size:11px;font-weight:700;color:#334155;display:block;margin-bottom:4px">TVSH</label>
+            <select id="prev-tvsh-opt" onchange="renderPrevCart()" style="border:2px solid #e2e8f0;border-radius:9px;padding:9px 10px;font-size:13px;font-family:'Inter',sans-serif;color:#1e293b;font-weight:600;outline:none;width:100%;background:#fff">
+              <option value="po">Po (20%)</option><option value="jo">Jo</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADD ITEM SECTION -->
+      <div style="margin:1.25rem 1.75rem 1rem;background:#f8fafc;border-radius:14px;padding:1.25rem;border:2px solid #e2e8f0">
+        <div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#334155;margin-bottom:1rem;display:flex;align-items:center;gap:8px">
+          <span style="display:inline-flex;width:22px;height:22px;background:#334155;color:#fff;border-radius:6px;align-items:center;justify-content:center;font-size:13px">+</span>
+          Shto Artikull në Ofertë
+        </div>
+        <div style="display:grid;grid-template-columns:2.5fr 1.2fr 1fr auto;gap:.75rem;align-items:end">
+          <div class="form-group" style="margin:0;position:relative">
+            <label style="font-size:11px;font-weight:600;color:#64748b;margin-bottom:4px;display:block">Produkti / Shërbimi</label>
+            <input id="prev-prod-search" autocomplete="off" placeholder="🔍 Kërko produkt..." oninput="prodSearchInputPrev(this.value)" style="background:#fff;border:2px solid #e2e8f0;border-radius:10px;padding:10px 13px;color:#1e293b;font-size:13px;font-family:'Inter',sans-serif;width:100%;outline:none;transition:border-color .2s;font-weight:500" onfocus="this.style.borderColor='#334155'" onblur="this.style.borderColor='#e2e8f0'">
+            <div id="prev-prod-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:2px solid #334155;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:500;max-height:220px;overflow-y:auto;margin-top:2px"></div>
+            <input type="hidden" id="prev-prod">
+          </div>
+          <div class="form-group" style="margin:0">
+            <label style="font-size:11px;font-weight:600;color:#64748b;margin-bottom:4px;display:block">Sasia & Njësia</label>
+            <div style="display:flex;gap:4px">
+              <input id="prev-sasia" type="number" placeholder="1" min="0.01" step="0.01" value="1" style="width:70px;flex-shrink:0;border:2px solid #e2e8f0;border-radius:10px;padding:10px 8px;font-size:13px;font-family:'Inter',sans-serif;color:#1e293b;outline:none;text-align:center;font-weight:700" onfocus="this.style.borderColor='#334155'" onblur="this.style.borderColor='#e2e8f0'">
+              <select id="prev-nje" style="flex:1;background:#fff;border:2px solid #e2e8f0;border-radius:10px;padding:10px 8px;font-size:12px;font-family:'Inter',sans-serif;color:#1e293b;outline:none">
+                <option>Cope</option><option>Metër</option><option>Kuti</option><option>Set</option><option>Paketë</option><option>Licencë</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group" style="margin:0">
+            <label id="prev-cms-label" style="font-size:11px;font-weight:600;color:#64748b;margin-bottom:4px;display:block">Çmimi (L)</label>
+            <input id="prev-cms" type="number" placeholder="0" step="0.01" style="border:2px solid #e2e8f0;border-radius:10px;padding:10px 12px;font-size:13px;font-family:'Inter',sans-serif;color:#1e293b;width:100%;outline:none;font-weight:700" onfocus="this.style.borderColor='#334155'" onblur="this.style.borderColor='#e2e8f0'" onkeydown="if(event.key==='Enter')prevCartAdd()">
+          </div>
+          <button class="btn" style="background:linear-gradient(135deg,#334155,#1e293b);color:#fef9c3;height:44px;border-radius:10px;font-size:14px;font-weight:800;padding:0 18px;white-space:nowrap;border:none;cursor:pointer" onclick="prevCartAdd()">➕ Shto</button>
+        </div>
+      </div>
+
+      <!-- CART TABLE -->
+      <div id="prev-cart-items" style="margin:0 1.75rem 1rem"></div>
+
+      <!-- TOTAL ROW -->
+      <div id="prev-cart-total" style="margin:0 1.75rem 1.25rem;text-align:right;font-size:15px;color:#334155;font-weight:700;background:#f1f5f9;border-radius:12px;padding:1rem 1.5rem;border:2px solid #e2e8f0"></div>
+    </div>
+
+    <div class="form-actions" style="flex-shrink:0;padding:1rem 1.75rem;border-top:2px solid #e2e8f0;margin-top:0;background:#f8fafc;border-radius:0 0 18px 18px">
+      <button class="btn btn-outline" onclick="closeModalById('modal-preventiv');document.removeEventListener('click',closeProdDropdownPrev,true)" style="font-size:13px;padding:10px 20px">Anulo</button>
+      <button class="btn" style="background:linear-gradient(135deg,#334155,#1e293b);color:#fef9c3;min-width:200px;font-size:14px;font-weight:800;padding:12px 28px;border-radius:10px;border:none;cursor:pointer;box-shadow:0 4px 16px rgba(51,65,85,.35)" onclick="addPreventiv()">✓ Regjistro Preventivin</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modal-addshitje">
   <div class="modal-box" id="shitje-box" style="width:900px;max-width:98vw;max-height:88vh;overflow-y:auto;display:flex;flex-direction:column">
     <div class="modal-header" id="shitje-drag-handle" style="flex-shrink:0">
@@ -1258,7 +1430,7 @@ select option{background:#fff}
       <div class="form-group"><label>Nr. Faturës (Opsionale)</label><div style="display:flex;gap:6px;align-items:center"><input id="s-fat" placeholder="F-SH-001" style="flex:1"><button type="button" onclick="document.getElementById('s-fat').value=nextFatNr('sh')" title="Gjenero automatikisht" style="background:linear-gradient(135deg,#4f6ef7,#7c5cfc);border:none;color:#fff;border-radius:8px;padding:0 10px;font-size:16px;cursor:pointer;height:40px;flex-shrink:0">🔄</button></div></div>
       <div class="form-group"><label>Data *</label><input id="s-data" type="date"></div>
       <div class="form-group"><label>Klienti (Opsionale)</label><input id="s-kli" value="Klient" placeholder="Emri klientit"></div>
-      <div class="form-group"><label>Mënyra Pagesës</label><select id="s-pag" onchange="togglePjesërisht()"><option>Cash</option><option>Debitor</option><option>Pjesërisht</option><option>Preventiv</option></select></div>
+      <div class="form-group"><label>Mënyra Pagesës</label><select id="s-pag" onchange="togglePjesërisht()"><option>Cash</option><option>Debitor</option><option>Pjesërisht</option></select></div>
       <div class="form-group"><label>Valuta</label><select id="s-curr" onchange="updateShitjeLabels()"><option value="ALL">Lekë (L)</option><option value="EUR">Euro (€)</option></select></div>
       <div class="form-group"><label>TVSH (20%)</label><select id="s-tvsh-opt" onchange="renderCart()"><option value="po">Po</option><option value="jo">Jo</option></select></div>
     </div>
@@ -1449,6 +1621,28 @@ select option{background:#fff}
   </div>
 </div>
 
+<!-- MODAL: Shiko Faturën (hapet pa ndryshuar tab) -->
+<div class="modal-overlay" id="modal-view-fature">
+  <div class="modal-box" style="width:720px;max-width:98vw;max-height:92vh;overflow-y:auto;display:flex;flex-direction:column;border-radius:16px;padding:0">
+    <div class="modal-header" style="flex-shrink:0;padding:.85rem 1.25rem;border-bottom:1px solid var(--border)">
+      <div style="font-size:14px;font-weight:700;color:var(--text)">🧾 Fatura</div>
+      <div style="display:flex;gap:6px;align-items:center">
+        <button class="modal-close" title="Maksimizo" onclick="toggleMaximize('modal-view-fature',this)">□</button>
+        <button class="modal-close" title="Minimizo" onclick="minimizeModal('modal-view-fature','🧾 Fatura')">—</button>
+        <button class="modal-close" onclick="closeModalById('modal-view-fature')">×</button>
+      </div>
+    </div>
+    <div id="modal-fature-content" style="padding:1.25rem;flex:1;overflow-y:auto"></div>
+    <div style="display:flex;gap:.6rem;flex-wrap:wrap;justify-content:flex-end;padding:.85rem 1.25rem;background:#f8fafc;border-top:1px solid var(--border);flex-shrink:0">
+      <button class="btn btn-outline btn-sm" onclick="closeModalById('modal-view-fature')">✕ Mbyll</button>
+      <button class="btn btn-outline btn-sm" onclick="printPOS80()">🖨 POS 80mm</button>
+      <button class="btn btn-outline btn-sm" onclick="printFature()">🖨 Print A4</button>
+      <button class="btn btn-primary btn-sm" onclick="exportPDF()">⬇ PDF A4</button>
+      <button class="btn btn-sm" id="modal-fature-paguaj-btn" style="display:none;background:linear-gradient(135deg,#f59e0b,#d97706);border:none;color:#fff;font-weight:700" onclick="if(currentFatureData)paguajPreventiv(currentFatureData.fat)">💵 Paguaj Preventivin</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modal-editshitje" onclick="closeModal(event,'modal-editshitje')">
   <div class="modal-box" style="width:600px;max-width:98vw">
     <div class="modal-header"><div class="modal-title">✏ Ndrysho Shitjen</div><div style="display:flex;gap:8px;align-items:center"><button class="modal-close" title="Maksimizo" onclick="toggleMaximize('modal-editshitje',this)">□</button><button class="modal-close" title="Minimizo" onclick="minimizeModal('modal-editshitje','✏ Ndrysho Shitje')">—</button><button class="modal-close" onclick="closeModalById('modal-editshitje')">×</button></div></div>
@@ -1544,6 +1738,13 @@ select option{background:#fff}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+// Early stubs so onclick="doLogin()" works before full script loads
+function doLogin() { _doLoginReal && _doLoginReal(); }
+function setLoginRole(r) { _setLoginRoleReal && _setLoginRoleReal(r); }
+function resetAdminPass() { _resetAdminPassReal && _resetAdminPassReal(); }
+var _doLoginReal, _setLoginRoleReal, _resetAdminPassReal;
+</script>
+<script>
 const SUPA_URL = 'https://sfcabrvvnvbnccbwnfvi.supabase.co';
 const SUPA_KEY = 'sb_publishable_aI6cQDd_9bjXfQ4HRwbiZw_POPTOZlV';
 const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
@@ -1560,6 +1761,11 @@ async function sbLoad(){
       sb.from('biz_cfg').select('*').eq('id',1).single()
     ]);
     if(u.data?.length) users = u.data;
+    else {
+      // Supabase nuk ktheu users, mbaj users lokale
+      const saved = localStorage.getItem('tp_users');
+      if(saved) users = JSON.parse(saved);
+    }
     if(p.data?.length) products = p.data;
     if(bl.data?.length) blerjet = bl.data.map(b=>({...b,cmb:Number(b.cmb),sasia:Number(b.sasia)}));
     if(sh.data?.length) shitjet = sh.data.map(s=>({...s,cms:Number(s.cms),sasia:Number(s.sasia),borxh:Number(s.borxh||0),ts:s.ts?Number(s.ts):null}));
@@ -1669,6 +1875,7 @@ function setLoginRole(role) {
   document.getElementById('role-user-btn').classList.toggle('active', role === 'user');
   document.getElementById('role-admin-btn').classList.toggle('active', role === 'admin');
 }
+_setLoginRoleReal = setLoginRole;
 
 async function doLogout(){
   if(!confirm('A jeni i sigurt që doni të dilni nga sistemi?'))return;
@@ -1842,6 +2049,20 @@ function _applyRoleUI(role) {
   }
 }
 
+function resetAdminPass(){
+  if(!confirm('Kjo do të rivendosë fjalëkalimin e admin-it në "admin123".\nVazhdoj?')) return;
+  const idx = users.findIndex(u=>u.username==='admin');
+  if(idx>=0){ users[idx].password='admin123'; users[idx].role='admin'; }
+  else { users.unshift({username:'admin',password:'admin123',role:'admin'}); }
+  localStorage.setItem('tp_users',JSON.stringify(users));
+  sessionStorage.removeItem('tp_local_session');
+  document.getElementById('login-user').value='admin';
+  document.getElementById('login-pass').value='admin123';
+  document.getElementById('login-err').style.display='none';
+  alert('✅ Fjalëkalimi u rivendos: admin / admin123');
+}
+_resetAdminPassReal = resetAdminPass;
+
 async function doLogin() {
   const username = document.getElementById('login-user').value.trim();
   const password = document.getElementById('login-pass').value;
@@ -1894,6 +2115,9 @@ async function doLogin() {
     if (submitBtn) { submitBtn.disabled=false; submitBtn.innerHTML='🔓 Hyr në Sistem'; }
   }
 }
+
+// Register real implementations for early stubs
+_doLoginReal = doLogin;
 
 let bizCfg = JSON.parse(localStorage.getItem('tp_bizcfg')||'null') || {
   emri: 'Emri i Biznesit',
@@ -1993,6 +2217,11 @@ let users = JSON.parse(localStorage.getItem('tp_users')||'null')||[
   {username: 'admin', password: 'admin123', role: 'admin'},
   {username: 'user', password: '1234', role: 'user'}
 ];
+// Sigurohu gjithmonë që admin ekziston
+if(!users.find(u=>u.username==='admin')){
+  users.unshift({username:'admin',password:'admin123',role:'admin'});
+  localStorage.setItem('tp_users',JSON.stringify(users));
+}
 let products = JSON.parse(localStorage.getItem('tp_products')||'null')||[
   { "id": "ART-001", "name": "Produkt Shembull 1", "kat": "Kategoria A", "nje": "Copë", "cmb": 500.0, "cms": 750.0, "stok": 50.0, "min": 10.0, "foto": "" },
   { "id": "ART-002", "name": "Produkt Shembull 2", "kat": "Kategoria A", "nje": "Copë", "cmb": 1200.0, "cms": 1800.0, "stok": 30.0, "min": 5.0, "foto": "" },
@@ -2065,6 +2294,7 @@ function llogaritXhiroSotme() {
     if (f.pag === 'Debitor') {
       debitor += totalMeTVSH;
     } else if (f.pag === 'Pjesërisht') {
+      // Në xhiro shkon vetëm shuma që është paguar vërtet (Cash)
       const vleftaPaguar = Number(meta.paguar || 0);
       cash += vleftaPaguar;
       debitor += Math.max(0, totalMeTVSH - vleftaPaguar);
@@ -2080,6 +2310,7 @@ function llogaritXhiroSotme() {
     }
   });
   
+  // Total Xhiro është vetëm Cash nga shitjet + Arkëtimet nga debitorët
   return { cash, debitor, arkCash, total: cash + arkCash };
 }
 
@@ -2287,8 +2518,8 @@ function renderXhiro() {
   const sot = today();
   const totalSot = llogaritXhiroSotme();
   
-  document.getElementById('xhiro-sot').textContent = fmtL(totalSot.total);
-  document.getElementById('xhiro-cash').textContent = fmtL(totalSot.cash + totalSot.arkCash);
+  document.getElementById('xhiro-sot').textContent = fmtL(totalSot.cash + totalSot.arkCash);
+  document.getElementById('xhiro-cash').textContent = fmtL(totalSot.cash);
   document.getElementById('xhiro-debitor').textContent = fmtL(totalSot.debitor);
   // Show arkëtime info if any
   const arkEl = document.getElementById('xhiro-arketim-info');
@@ -3218,6 +3449,182 @@ let cart=[];
 let blerjeCart=[];
 let dsCart=[];
 let dsPriceType='1';
+let prevCart=[];
+
+function updatePrevHeader(){
+  const nr = document.getElementById('prev-fat')?.value || '—';
+  const data = document.getElementById('prev-data')?.value || '—';
+  const kli = document.getElementById('prev-kli')?.value || '—';
+  const el_nr = document.getElementById('prev-hdr-nr');
+  const el_data = document.getElementById('prev-hdr-data');
+  const el_kli = document.getElementById('prev-hdr-kli');
+  const el_biz = document.getElementById('prev-hdr-bizname');
+  const el_adr = document.getElementById('prev-hdr-adresa');
+  const el_nipt = document.getElementById('prev-hdr-nipt');
+  if(el_nr) el_nr.textContent = nr || '—';
+  if(el_data) el_data.textContent = data || '—';
+  if(el_kli) el_kli.textContent = kli || '—';
+  if(el_biz) el_biz.textContent = bizCfg.emri || '—';
+  const adrParts = [bizCfg.rruga, bizCfg.qyteti].filter(Boolean);
+  if(el_adr) el_adr.textContent = adrParts.join(', ') + (bizCfg.tel ? ' · Tel: ' + bizCfg.tel : '');
+  if(el_nipt && bizCfg.nipt) el_nipt.textContent = 'NIPT: ' + bizCfg.nipt;
+}
+
+function openPreventivModal(){
+  prevCart=[];
+  renderPrevCart();
+  document.getElementById('prev-fat').value='PREV-'+Date.now().toString().slice(-6);
+  document.getElementById('prev-data').value=today();
+  document.getElementById('prev-kli').value='Klient';
+  document.getElementById('prev-prod-search').value='';
+  document.getElementById('prev-prod').value='';
+  document.getElementById('prev-cms').value='';
+  document.getElementById('prev-sasia').value='1';
+  document.getElementById('prev-curr').value='ALL';
+  document.getElementById('prev-tvsh-opt').value='po';
+  document.getElementById('modal-preventiv').classList.add('open');
+  document.addEventListener('click', closeProdDropdownPrev, true);
+  updatePrevHeader();
+}
+
+function prodSearchInputPrev(val){
+  const dd=document.getElementById('prev-prod-dropdown');
+  if(!val||!val.trim()){dd.style.display='none';return;}
+  const q=val.trim().toLowerCase();
+  const match=products.filter(p=>
+    (p.name||'').toLowerCase().includes(q)||
+    (p.id||'').toLowerCase().includes(q)||
+    (p.kat||'').toLowerCase().includes(q)
+  ).slice(0,12);
+  if(!match.length){
+    dd.innerHTML='<div style="padding:10px 14px;font-size:13px;color:#94a3b8">Nuk u gjet asnjë produkt</div>';
+    dd.style.display='block';return;
+  }
+  dd.innerHTML=match.map(p=>`
+    <div onclick="selectProdPrev('${p.id}','${(p.name||'').replace(/'/g,"\\'")}',${p.cms})" style="padding:10px 14px;cursor:pointer;border-bottom:1px solid #f1f5f9;transition:background .1s" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background=''">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <span style="font-weight:700;font-size:13px;color:#1e293b">${p.name}</span>
+          <span style="font-size:10px;color:#94a3b8;margin-left:6px;font-family:'JetBrains Mono',monospace">${p.id}</span>
+        </div>
+        <div style="text-align:right">
+          <div style="font-weight:800;color:#334155;font-size:13px">${fmtL(p.cms)}</div>
+          <div style="font-size:11px;color:${p.stok<=p.min?'#dc2626':'#16a34a'}">Stok: ${p.stok} ${p.nje}</div>
+        </div>
+      </div>
+    </div>`).join('');
+  dd.style.display='block';
+}
+
+function selectProdPrev(id,name,cms){
+  document.getElementById('prev-prod').value=id;
+  document.getElementById('prev-prod-search').value=name;
+  document.getElementById('prev-cms').value=cms;
+  document.getElementById('prev-prod-dropdown').style.display='none';
+  const p=getProd(id);
+  if(p){
+    const njeEl=document.getElementById('prev-nje');
+    if(njeEl){const opt=[...njeEl.options].find(o=>o.value===p.nje);if(opt)njeEl.value=opt.value;}
+  }
+  document.getElementById('prev-sasia').focus();
+  document.getElementById('prev-sasia').select();
+}
+
+function closeProdDropdownPrev(e){
+  const dd=document.getElementById('prev-prod-dropdown');
+  if(dd && !dd.contains(e.target)) dd.style.display='none';
+}
+
+function prevCartAdd(){
+  const id=document.getElementById('prev-prod').value;
+  const name=document.getElementById('prev-prod-search').value;
+  const sasia=+document.getElementById('prev-sasia').value;
+  const cms=+document.getElementById('prev-cms').value;
+  const nje=document.getElementById('prev-nje').value;
+  if(!name||!sasia||!cms){alert('Zgjidh produktin, sasinë dhe çmimin!');return;}
+  prevCart.push({prodId:id,name,sasia,cms,nje,total:sasia*cms});
+  renderPrevCart();
+  document.getElementById('prev-prod').value='';
+  document.getElementById('prev-prod-search').value='';
+  document.getElementById('prev-cms').value='';
+  document.getElementById('prev-prod-search').focus();
+}
+
+function renderPrevCart(){
+  const div=document.getElementById('prev-cart-items');
+  const totDiv=document.getElementById('prev-cart-total');
+  if(!div)return;
+  if(!prevCart.length){
+    div.innerHTML='<div style="margin:0 0 1rem;padding:2rem;text-align:center;color:#94a3b8;background:#f8fafc;border-radius:12px;border:2px dashed #e2e8f0;font-size:13px;font-weight:600">Nuk ka artikuj të shtuar. Kërko dhe shto produktet sipër.</div>';
+    totDiv.innerHTML='';
+    return;
+  }
+  div.innerHTML=`<div style="border-radius:12px;overflow:hidden;border:2px solid #e2e8f0;margin-bottom:.5rem">
+    <table style="width:100%;border-collapse:collapse;font-size:13px">
+    <thead><tr style="background:#1e293b">
+      <th style="text-align:left;padding:11px 16px;color:#cbd5e1;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em">Artikulli</th>
+      <th style="text-align:center;padding:11px 12px;color:#cbd5e1;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em">Sasia</th>
+      <th style="text-align:right;padding:11px 16px;color:#cbd5e1;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em">Çmimi</th>
+      <th style="text-align:right;padding:11px 16px;color:#cbd5e1;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em">Total</th>
+      <th style="width:44px"></th>
+    </tr></thead>
+    <tbody>${prevCart.map((c,i)=>`<tr style="border-bottom:1px solid #f1f5f9;background:${i%2===0?'#fff':'#f8fafc'}">
+      <td style="padding:12px 16px;font-weight:700;color:#1e293b">${c.name}</td>
+      <td style="text-align:center;padding:12px;color:#64748b;font-weight:600">${c.sasia} <span style="font-size:11px;color:#94a3b8">${c.nje}</span></td>
+      <td style="text-align:right;padding:12px 16px;color:#475569;font-weight:600">${fmtL(c.cms)}</td>
+      <td style="text-align:right;padding:12px 16px;font-weight:800;color:#1e293b;font-size:14px">${fmtL(c.total)}</td>
+      <td style="text-align:center;padding:8px"><button class="btn btn-danger btn-sm" onclick="prevCart.splice(${i},1);renderPrevCart()" style="font-size:12px;padding:4px 9px">✕</button></td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+  const subtot=prevCart.reduce((s,c)=>s+c.total,0);
+  const tvshOpt=document.getElementById('prev-tvsh-opt').value;
+  const tvsh=tvshOpt==='po'?subtot*0.2:0;
+  totDiv.innerHTML=`<div style="display:flex;justify-content:flex-end;gap:2rem;align-items:center">
+    <span style="font-size:13px;color:#64748b">Nëntotali: <strong style="color:#334155">${fmtL(subtot)}</strong></span>
+    <span style="font-size:13px;color:#64748b">TVSH (20%): <strong style="color:#334155">${fmtL(tvsh)}</strong></span>
+    <span style="font-size:20px;font-weight:900;color:#1e293b;background:#e2e8f0;padding:10px 20px;border-radius:10px">TOTAL: ${fmtL(subtot+tvsh)}</span>
+  </div>`;
+}
+
+function updatePrevLabels(){
+  const curr=document.getElementById('prev-curr').value;
+  document.getElementById('prev-cms-label').textContent=`Çmimi (${curr==='EUR'?'€':'L'})`;
+  renderPrevCart();
+}
+
+async function addPreventiv(){
+  await ensureRealTimeRate();
+  const fat=document.getElementById('prev-fat').value.trim() || ('PREV-'+Date.now());
+  const data=document.getElementById('prev-data').value;
+  const kli=document.getElementById('prev-kli').value.trim();
+  const curr=document.getElementById('prev-curr').value;
+  const tvshOpt=document.getElementById('prev-tvsh-opt').value;
+  if(!prevCart.length){alert('Shto artikuj në preventiv!');return;}
+  
+  const rate=(curr==='EUR'&&exchangeRateEUR>0)?exchangeRateEUR:1;
+  const cartALL=prevCart.map(c=>({...c,cms:c.cms*rate,total:c.sasia*c.cms*rate}));
+  const subtotal=cartALL.reduce((s,c)=>s+c.total,0);
+  const tvsh=tvshOpt==='po'?subtotal*0.2:0;
+  const totalFat=subtotal+tvsh;
+  
+  // Regjistrojmë si preventiv (pa prekur stokun)
+  faturatMeta[fat]={status:'preventiv',paguar:0,borxh:0,afat:'',kli,data,valuta:curr,tvshOpt};
+  
+  const tsNow=Date.now();
+  cartALL.forEach(c=>{
+    shitjet.push({id:'S'+tsNow+Math.random().toString(36).slice(2,6),fat,data,kli,prod:c.prodId,sasia:c.sasia,cms:c.cms,pag:'Preventiv',ts:tsNow});
+  });
+  
+  save();renderAll();
+  
+  // Shfaqim faturën për printim
+  const items=prevCart.map(c=>({name:c.name,kodi:c.prodId,nje:c.nje,sasia:c.sasia,cm:c.cms,total:c.total}));
+  currentFatureData={tipi:'SHITJEJE',fat,data,pale:kli,pag:'Preventiv',items,subtotal:prevCart.reduce((s,c)=>s+c.total,0),tvsh:tvshOpt==='po'?prevCart.reduce((s,c)=>s+c.total,0)*0.2:0,total:prevCart.reduce((s,c)=>s+c.total,0)*(tvshOpt==='po'?1.2:1),status:'preventiv',paguar:0,borxh:0,afat:'',valuta:curr};
+  
+  closeModalById('modal-preventiv');
+  showFatureInline();
+  showToast('✓ Preventivi u regjistrua me sukses!');
+}
 
 function toggleInlineShitje(show){
   const el=document.getElementById('dash-shitje-inline');
@@ -3528,7 +3935,9 @@ async function dsAddShitje() {
     
     // Resetimi i plotë për faturë të re
     dsCart = [];
-    document.getElementById('ds-kli').value = '';
+    document.getElementById('ds-kli').value = 'Klient';
+    document.getElementById('ds-pag').value = 'Cash';
+    document.getElementById('ds-pjeserisht-row').style.display = 'none';
     document.getElementById('ds-fat').value = nextFatNr('sh');
     document.getElementById('ds-paguar').value = '';
     document.getElementById('ds-borxh').value = '';
@@ -3764,7 +4173,9 @@ async function addShitje() {
     
     // Resetimi i plotë për faturë të re
     cart = [];
-    document.getElementById('s-kli').value = '';
+    document.getElementById('s-kli').value = 'Klient';
+    document.getElementById('s-pag').value = 'Cash';
+    document.getElementById('pjeserisht-row').style.display = 'none';
     document.getElementById('s-fat').value = nextFatNr('sh');
     document.getElementById('s-paguar').value = '';
     document.getElementById('s-borxh').value = '';
@@ -4473,7 +4884,10 @@ function renderShitjet(){
         <div style="display:flex;gap:.4rem;flex-wrap:wrap">
           <button class="btn btn-outline btn-sm" style="flex:1" onclick="showFatureByFat('${f.fat}')">🧾 Fatura</button>
           <button class="btn btn-outline btn-sm" style="flex:1" onclick="openEditShitjeModal('${f.fat}')">✏ Ndrysho</button>
-          ${status!=='paguar'?`<button class="btn btn-success btn-sm" style="flex:1" onclick="markPaguar('${f.fat}')">✓ Pagoi</button>`:''}
+          ${status==='preventiv'
+            ? `<button class="btn btn-success btn-sm" style="flex:1;background:linear-gradient(135deg,#f59e0b,#d97706);border-color:#d97706;color:#fff" onclick="paguajPreventiv('${f.fat}')">💵 Paguaj</button>`
+            : status!=='paguar'?`<button class="btn btn-success btn-sm" style="flex:1" onclick="markPaguar('${f.fat}')">✓ Pagoi</button>`:''
+          }
           <button class="btn btn-danger btn-sm" onclick="deleteShitje('${f.fat}')">🗑</button>
         </div>
       </div></td></tr>`;
@@ -4509,14 +4923,137 @@ function renderShitjet(){
       <td style="display:flex;gap:4px;flex-wrap:wrap">
         <button class="btn btn-outline btn-sm" onclick="showFatureByFat('${f.fat}')">🧾</button>
         <button class="btn btn-outline btn-sm" onclick="openEditShitjeModal('${f.fat}')">✏</button>
-        ${status!=='paguar'?`<button class="btn btn-success btn-sm" onclick="markPaguar('${f.fat}')">✓ Pagoi</button>`:''}
+        ${status==='preventiv'
+          ? `<button class="btn btn-success btn-sm" onclick="paguajPreventiv('${f.fat}')" style="background:linear-gradient(135deg,#f59e0b,#d97706);border-color:#d97706;color:#fff">💵 Paguaj</button>`
+          : status!=='paguar'?`<button class="btn btn-success btn-sm" onclick="markPaguar('${f.fat}')">✓ Pagoi</button>`:''
+        }
         <button class="btn btn-danger btn-sm" onclick="deleteShitje('${f.fat}')">🗑</button>
       </td>
     </tr>`;
   }).join('')||'<tr><td colspan="10" style="color:var(--text3);text-align:center;padding:2rem">Nuk ka shitje.</td></tr>';
 }
 
-function markPaguar(fat){
+function paguajPreventiv(fat){
+  const meta = faturatMeta[fat] || {};
+  const klienti = (shitjet.find(s=>s.fat===fat)||{}).kli || fat;
+  const dataFat = (shitjet.find(s=>s.fat===fat)||{}).data || today();
+  const totFat = shitjet.filter(s=>s&&s.fat===fat).reduce((s,x)=>s+(x.sasia||0)*(x.cms||0),0);
+  const kaTVSH = meta.tvshOpt==='po';
+  const totalFat = kaTVSH ? totFat*1.2 : totFat;
+
+  const existing = document.getElementById('dlg-prev-pay');
+  if(existing) existing.remove();
+
+  const dlg = document.createElement('div');
+  dlg.id = 'dlg-prev-pay';
+  dlg.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem';
+  dlg.innerHTML = `
+    <div style="background:#fff;border-radius:18px;padding:1.75rem;width:400px;max-width:96vw;box-shadow:0 20px 60px rgba(0,0,0,.3);animation:loginPop .25s cubic-bezier(.16,1,.3,1)">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.25rem">
+        <div>
+          <div style="font-size:15px;font-weight:800;color:var(--text)">💵 Konverto Preventiv → Faturë</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:3px">${fat} &nbsp;·&nbsp; <b style="color:var(--text)">${klienti}</b></div>
+        </div>
+        <button onclick="document.getElementById('dlg-prev-pay').remove()" style="background:var(--bg);border:none;width:28px;height:28px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--text3)">✕</button>
+      </div>
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:11px;padding:.85rem 1.1rem;margin-bottom:1.25rem;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:12px;color:#166534;font-weight:600">💰 Totali i preventivit</span>
+        <span style="font-size:17px;font-weight:800;color:#16a34a">${fmtL(totalFat)}</span>
+      </div>
+      <div style="margin-bottom:1rem">
+        <div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.6rem">Mënyra e Pagesës</div>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+          <button id="ppv-cash" onclick="setPrevPagType('Cash')" style="flex:1;padding:9px;border-radius:9px;border:2px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer;font-size:13px;font-weight:700;font-family:'Inter',sans-serif">💵 Cash</button>
+          <button id="ppv-deb" onclick="setPrevPagType('Debitor')" style="flex:1;padding:9px;border-radius:9px;border:2px solid var(--border);background:#fff;color:var(--text2);cursor:pointer;font-size:13px;font-weight:700;font-family:'Inter',sans-serif">🔴 Debitor</button>
+          <button id="ppv-pjes" onclick="setPrevPagType('Pjesërisht')" style="flex:1;padding:9px;border-radius:9px;border:2px solid var(--border);background:#fff;color:var(--text2);cursor:pointer;font-size:13px;font-weight:700;font-family:'Inter',sans-serif">◑ Pjesërisht</button>
+        </div>
+      </div>
+      <div id="ppv-pjeserisht-row" style="display:none;margin-bottom:1rem;background:#f5f3ff;border:1px solid #ede9fe;border-radius:10px;padding:.9rem 1rem">
+        <div style="font-size:11px;font-weight:700;color:#4c1d95;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.6rem">Shuma e paguar tani (L)</div>
+        <input id="ppv-paguar-inp" type="number" placeholder="0" min="0" step="1"
+          style="width:100%;border:1.5px solid #ede9fe;border-radius:9px;padding:10px 12px;font-size:15px;font-weight:700;font-family:'Inter',sans-serif;outline:none;color:#1e293b"
+          onfocus="this.style.borderColor='#7c3aed'" onblur="this.style.borderColor='#ede9fe'">
+      </div>
+      <button onclick="doKonvertoPreventiv('${fat}','${klienti}','${dataFat}',${totalFat})"
+        style="width:100%;background:linear-gradient(135deg,#22c55e,#16a34a);border:none;color:#fff;border-radius:11px;padding:13px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;margin-top:.25rem">
+        ✓ Konfirmo Pagesën
+      </button>
+    </div>`;
+  document.body.appendChild(dlg);
+  dlg.addEventListener('click', e => { if(e.target===dlg) dlg.remove(); });
+}
+
+function setPrevPagType(tip){
+  ['Cash','Debitor','Pjesërisht'].forEach(t=>{
+    const id = t==='Cash'?'ppv-cash':t==='Debitor'?'ppv-deb':'ppv-pjes';
+    const btn = document.getElementById(id);
+    if(!btn) return;
+    const active = t===tip;
+    btn.style.background = active ? 'var(--accent)' : '#fff';
+    btn.style.color = active ? '#fff' : 'var(--text2)';
+    btn.style.borderColor = active ? 'var(--accent)' : 'var(--border)';
+  });
+  document.getElementById('ppv-pjeserisht-row').style.display = tip==='Pjesërisht' ? 'block' : 'none';
+  document.getElementById('dlg-prev-pay').dataset.pagTip = tip;
+}
+
+function doKonvertoPreventiv(fat, klienti, dataFat, totalFat){
+  const dlg = document.getElementById('dlg-prev-pay');
+  const pagTip = dlg?.dataset.pagTip || 'Cash';
+  let paguar = totalFat;
+  let borxh = 0;
+
+  if(pagTip === 'Debitor'){
+    paguar = 0;
+    borxh = totalFat;
+  } else if(pagTip === 'Pjesërisht'){
+    const inp = parseFloat(document.getElementById('ppv-paguar-inp')?.value);
+    if(isNaN(inp)||inp<0){ alert('Vendos shumën e paguar!'); return; }
+    paguar = Math.min(inp, totalFat);
+    borxh = Math.max(0, totalFat - paguar);
+  }
+
+  // 1. Ndrysho statusin dhe mënyrën e pagesës në meta
+  if(!faturatMeta[fat]) faturatMeta[fat] = {};
+  faturatMeta[fat].status = borxh > 0 ? (paguar > 0 ? 'pjeserisht' : 'papaguar') : 'paguar';
+  faturatMeta[fat].pag = pagTip;
+  faturatMeta[fat].paguar = paguar;
+  faturatMeta[fat].borxh = borxh;
+
+  // 2. Ndrysho pag dhe përditëso ts/data në çdo rresht shitjeje të kësaj fature
+  // ts duhet të jetë momenti i pagesës (jo krijimit të preventivit), që shitja të llogaritet në xhiron e sotme
+  const tsPagese = Date.now();
+  const dataPagese = today();
+  shitjet.forEach(s => {
+    if(s.fat === fat) {
+      s.pag = pagTip;
+      s.ts = tsPagese;
+      s.data = dataPagese;
+    }
+  });
+
+  // 3. Zbrit stokun (preventivi nuk e kishte zbritur)
+  shitjet.filter(s => s.fat === fat).forEach(s => {
+    const p = products.find(x => x.id === s.prod);
+    if(p) p.stok -= s.sasia;
+  });
+
+  // 4. Regjistro arkëtim nëse ka pagesë
+  if(paguar > 0){
+    arketimet.push({ id:'ARK-'+Date.now(), fat, kli:klienti, dataFat, data:today(), ts:Date.now(), shuma:paguar });
+    localStorage.setItem('tp_arketimet', JSON.stringify(arketimet));
+  }
+
+  dlg?.remove();
+  save();
+  renderAll();
+
+  // 5. Shfaq faturën e re si shitje
+  showFatureByFat(fat);
+  showToast(`✅ Preventivi ${fat} u konvertua në faturë shitje — ${pagTip}!`);
+}
+
+function markPaguar(fat) {
   const meta = faturatMeta[fat] || {};
   const totFat = shitjet.filter(s=>s&&s.fat===fat).reduce((s,x)=>s+(x.sasia||0)*(x.cms||0),0);
   const kaTVSH = meta.tvshOpt==='po';
@@ -5534,6 +6071,21 @@ function showFature(tipi,id,fatObj){
 }
 
 function showFatureInline(){
+  // Shfaq faturën si modal — pa ndryshuar tab ku ndodhemi
+  const content = document.getElementById('modal-fature-content');
+  if(content){
+    content.innerHTML = buildFatureHTML(currentFatureData);
+    _generateFaturaQR(currentFatureData);
+    // Shfaq butonin "Paguaj" vetëm për preventiv
+    const paguajBtn = document.getElementById('modal-fature-paguaj-btn');
+    if(paguajBtn){
+      const isPrev = currentFatureData && (currentFatureData.status==='preventiv' || currentFatureData.pag==='Preventiv');
+      paguajBtn.style.display = isPrev ? 'inline-flex' : 'none';
+    }
+    document.getElementById('modal-view-fature').classList.add('open');
+    return;
+  }
+  // Fallback: dashboard inline (nëse mungon modali)
   const dashTab=document.getElementById('tab-0');
   if(dashTab && !dashTab.classList.contains('active')){
     const navBtns=document.querySelectorAll('.nav-btn');
@@ -5607,23 +6159,36 @@ function buildFatureHTML(d){
     ? '<span style="background:#fee2e2;color:#dc2626;padding:3px 12px;border-radius:20px;font-size:13px">🔴 Debitor</span>'
     : d.pag;
 
-  return `<div id="fat-print-body" style="font-family:'Inter',system-ui,sans-serif;color:#111827;background:#fff;max-width:680px;margin:0 auto">
+  return `<div id="fat-print-body" class="fature-wrapper ${isPrev?'preventiv-theme':''}" style="font-family:'Inter',system-ui,sans-serif;color:#111827;background:#fff;max-width:680px;margin:0 auto">
+    ${isPrev ? '<div class="watermark">PREVENTIV</div>' : ''}
 
-    <!-- HEADER me gradient si Hotel Adriatik -->
-    <div style="background:linear-gradient(135deg,#1e3a5f 0%,#1a6b8a 45%,#1a8a6b 100%);padding:2.2rem 2.5rem 2rem;display:flex;justify-content:space-between;align-items:flex-start;border-radius:0">
+    <!-- HEADER — stil i njëjtë me modalin preventiv -->
+    <div class="fature-header" style="background:#1e293b;padding:1.5rem 2rem;display:grid;grid-template-columns:1fr auto;gap:1.5rem;align-items:start;border-radius:0">
+      <!-- E majta: Lëshuar nga + emri biznesi -->
       <div>
-        ${bizCfg.logo?`<img src="${bizCfg.logo}" style="height:44px;margin-bottom:10px;display:block;filter:brightness(0) invert(1)" alt="Logo">`:''}
-        <div style="font-size:20px;font-weight:800;color:#ffffff;letter-spacing:-.02em">${bizCfg.emri}</div>
-        <div style="font-size:12px;color:rgba(255,255,255,0.72);line-height:1.9;margin-top:4px">
+        ${bizCfg.logo?`<img src="${bizCfg.logo}" style="height:40px;margin-bottom:10px;display:block;filter:brightness(0) invert(1)" alt="Logo">`:''}
+        <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem">Lëshuar nga</div>
+        <div style="font-size:18px;font-weight:900;color:#f8fafc;letter-spacing:-.3px;line-height:1.2">${bizCfg.emri||'—'}</div>
+        <div style="font-size:12px;color:#94a3b8;margin-top:.35rem;line-height:1.7">
           ${bizCfg.adresa?`${bizCfg.adresa}<br>`:''}
-          ${(bizCfg.tel&&bizCfg.email)?`Tel: ${bizCfg.tel} · ${bizCfg.email}<br>`:bizCfg.tel?`Tel: ${bizCfg.tel}<br>`:bizCfg.email?`${bizCfg.email}<br>`:''}
-          ${bizCfg.nipt?`NIPT: ${bizCfg.nipt}`:''}
+          ${bizCfg.tel?`Tel: ${bizCfg.tel}`:''} ${bizCfg.email?`· ${bizCfg.email}`:''}
         </div>
+        ${bizCfg.nipt?`<div style="font-size:11px;color:#64748b;margin-top:.2rem;font-family:'JetBrains Mono',monospace">NIPT: ${bizCfg.nipt}</div>`:''}
       </div>
+      <!-- E djathta: PREVENTIV badge + nr + datë + klient -->
       <div style="text-align:right">
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.16em;color:rgba(255,255,255,0.6);margin-bottom:6px">${isPrev?'OFERTË / QUOTATION':'FATURË / INVOICE'}</div>
-        <div style="font-size:20px;font-weight:800;color:#ffffff;letter-spacing:-.01em">${d.fat}</div>
-        <div style="font-size:12.5px;color:rgba(255,255,255,0.75);margin-top:6px;font-weight:500">Data: ${d.data}</div>
+        ${isPrev
+          ? `<div style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#1c1917;font-size:18px;font-weight:900;letter-spacing:4px;text-transform:uppercase;padding:5px 18px;border-radius:8px;display:inline-block;margin-bottom:.75rem">PREVENTIV</div>`
+          : `<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.16em;color:rgba(255,255,255,0.55);margin-bottom:6px">FATURË / INVOICE</div>`
+        }
+        <div style="display:grid;grid-template-columns:auto auto;gap:.3rem .75rem;text-align:right;margin-top:.3rem">
+          <span style="font-size:11px;color:#64748b;font-weight:600;text-align:right">${isPrev?'Nr. Oferte:':'Nr. Faturës:'}</span>
+          <span style="font-size:12px;color:#f1f5f9;font-weight:800;font-family:'JetBrains Mono',monospace">${d.fat}</span>
+          <span style="font-size:11px;color:#64748b;font-weight:600;text-align:right">Data:</span>
+          <span style="font-size:12px;color:#f1f5f9;font-weight:700">${d.data}</span>
+          <span style="font-size:11px;color:#64748b;font-weight:600;text-align:right">${d.tipi==='SHITJEJE'?'Klienti:':'Furnitori:'}</span>
+          <span style="font-size:12px;color:#fbbf24;font-weight:800">${d.pale||'—'}</span>
+        </div>
       </div>
     </div>
 
@@ -5657,13 +6222,13 @@ function buildFatureHTML(d){
 
     <!-- TOTALET -->
     <div style="display:flex;justify-content:flex-end;padding:0 2.5rem 1.5rem">
-      <div style="min-width:240px">
+      <div style="min-width:240px;width:100%;max-width:340px">
         <div style="display:flex;justify-content:space-between;padding:7px 0;font-size:13px;color:#6b7280;border-bottom:1px solid #f1f5f9">
           <span>Nëntotali</span><span>${fmtModal(d.subtotal,curr)}</span>
         </div>
-        <div style="display:flex;justify-content:space-between;padding:7px 0;font-size:13px;color:#6b7280;border-bottom:1px solid #f1f5f9">
+        ${d.tvsh>0?`<div style="display:flex;justify-content:space-between;padding:7px 0;font-size:13px;color:#6b7280;border-bottom:1px solid #f1f5f9">
           <span>TVSH (20%)</span><span>${fmtModal(d.tvsh,curr)}</span>
-        </div>
+        </div>`:''}
         ${d.borxh>0?`<div style="display:flex;justify-content:space-between;padding:7px 0;font-size:13px;color:#16a34a;border-bottom:1px solid #f1f5f9">
           <span>Paguar</span><span style="font-weight:600">-${fmtModal(d.paguar,curr)}</span>
         </div>`:''}
@@ -5687,7 +6252,7 @@ function buildFatureHTML(d){
     ${kursiHTML ? `<div style="padding:8px 2.5rem 0">${kursiHTML}</div>` : ''}
 
     <!-- FOOTER -->
-    <div style="padding:1.4rem 2.5rem;border-top:1px solid #f1f5f9;margin-top:.5rem">
+    <div class="fature-footer" style="padding:1.4rem 2.5rem;border-top:1px solid #f1f5f9;margin-top:.5rem">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:1.2rem">
         <div style="font-size:12px;color:#6b7280;line-height:1.7">
           ${bizCfg.footer?`${bizCfg.footer}<br>`:''}
@@ -5820,7 +6385,7 @@ function printPOS80(){
   ${rows}
   <div class="sep"></div>
   <div class="row" style="font-size:12px"><span>Nëntotali:</span><span>${fmtModal(d.subtotal, curr)}</span></div>
-  <div class="row" style="font-size:12px;margin-bottom:4px"><span>TVSH:</span><span>${fmtModal(d.tvsh, curr)}</span></div>
+  ${d.tvsh>0?`<div class="row" style="font-size:12px;margin-bottom:4px"><span>TVSH:</span><span>${fmtModal(d.tvsh, curr)}</span></div>`:''}
   <div class="total-row"><span>TOTAL:</span><span>${fmtModal(d.total, curr)}</span></div>
   ${d.borxh>0?`<div class="sep"></div><div class="row" style="font-size:12px"><span>Paguar:</span><span>${fmtModal(d.paguar||0, curr)}</span></div><div class="row bold" style="font-size:12px"><span>Borxh mbetur:</span><span>${fmtModal(d.borxh, curr)}</span></div>`:''}
   <div class="sep"></div>
@@ -5844,9 +6409,17 @@ function exportPDF(){
   const curr = d.valuta || 'ALL';
   const isPrev = d.status==='preventiv' || d.pag==='Preventiv';
 
-  // HEADER gradient (blu-jeshile si fatura HTML)
-  doc.setFillColor(30,58,95);doc.rect(0,0,pw/2,30,'F');
-  doc.setFillColor(26,107,138);doc.rect(pw/2-1,0,pw/2+1,30,'F');
+  // HEADER gradient
+  if(isPrev){
+    doc.setFillColor(51,65,85);doc.rect(0,0,pw,30,'F');
+    doc.setTextColor(255,255,255);doc.setFontSize(22);doc.setFont('helvetica','bold');
+    doc.text('PREVENTIV', pw/2, 18, {align:'center'});
+    // Reset colors for company name
+    doc.setTextColor(255,255,255);doc.setFontSize(14);
+  } else {
+    doc.setFillColor(30,58,95);doc.rect(0,0,pw/2,30,'F');
+    doc.setFillColor(26,107,138);doc.rect(pw/2-1,0,pw/2+1,30,'F');
+  }
   doc.setTextColor(255,255,255);doc.setFontSize(16);doc.setFont('helvetica','bold');doc.text(bizCfg.emri,14,13);
   doc.setFontSize(8);doc.setFont('helvetica','normal');doc.text([bizCfg.adresa,bizCfg.nipt?'NIPT: '+bizCfg.nipt:'',bizCfg.tel?'Tel: '+bizCfg.tel:''].filter(Boolean).join('  ·  '),14,21);
   doc.setFontSize(8);doc.setTextColor(200,230,255);doc.text(isPrev?'OFERTË / QUOTATION':'FATURË / INVOICE',pw-14,11,{align:'right'});
@@ -5859,7 +6432,17 @@ function exportPDF(){
   doc.setFont('helvetica','normal');doc.setFontSize(11);doc.text(d.pale||'—',14,53);
   doc.setFont('helvetica','bold');doc.setFontSize(10);doc.text('MËNYRA PAGESËS:',pw/2,46);
   doc.setFont('helvetica','normal');doc.setFontSize(11);doc.text(d.pag||'—',pw/2,53);
-  if(isPrev){doc.setTextColor(124,58,237);doc.setFont('helvetica','bold');doc.setFontSize(9);doc.text('Vlerësim çmimi — nuk është faturë tatimore',pw-14,53,{align:'right'});}
+  if(isPrev){
+    // Watermark në PDF
+    doc.setTextColor(240,240,240);doc.setFontSize(60);doc.setFont('helvetica','bold');
+    doc.saveGraphicsState();
+    doc.setGState(new doc.GState({opacity: 0.1}));
+    doc.text('PREVENTIV', pw/2, ph/2, {align:'center', angle:45});
+    doc.restoreGraphicsState();
+
+    doc.setTextColor(217,119,6);doc.setFont('helvetica','bold');doc.setFontSize(9);
+    doc.text('Ofertë Çmimi — Informacion mbi vlerat e kërkuara',pw-14,53,{align:'right'});
+  }
 
   // TABELA ARTIKUJVE
   doc.autoTable({startY:62,head:[['#','Artikulli','Njësia','Sasia','Çmimi','Totali']],body:d.items.map((it,i)=>[String(i+1),it.name,it.nje,String(it.sasia),fmtModal(it.cm,curr),fmtModal(it.total,curr)]),theme:'plain',headStyles:{fillColor:[17,24,39],textColor:255,fontSize:9,fontStyle:'bold',lineWidth:0},columnStyles:{0:{halign:'center',cellWidth:10},2:{halign:'center',cellWidth:18},3:{halign:'center',cellWidth:16},4:{halign:'right',cellWidth:30},5:{halign:'right',cellWidth:30}},styles:{fontSize:10,cellPadding:4,lineColor:[241,245,249],lineWidth:0.3},alternateRowStyles:{fillColor:[248,250,252]}});
@@ -5869,12 +6452,13 @@ function exportPDF(){
   doc.setDrawColor(220,220,220);doc.line(bx,fy,pw-14,fy);
   doc.setTextColor(100,100,100);doc.setFontSize(9);doc.setFont('helvetica','normal');
   doc.text('Nëntotali',bx,fy+7);doc.text(fmtModal(d.subtotal,curr),pw-14,fy+7,{align:'right'});
-  doc.text('TVSH (20%)',bx,fy+14);doc.text(fmtModal(d.tvsh,curr),pw-14,fy+14,{align:'right'});
-  if(d.paguar>0){doc.setTextColor(22,163,74);doc.text('Paguar',bx,fy+21);doc.text('-'+fmtModal(d.paguar,curr),pw-14,fy+21,{align:'right'});}
-  doc.setLineWidth(.5);doc.setDrawColor(17,24,39);doc.line(bx,fy+(d.paguar>0?24:17),pw-14,fy+(d.paguar>0?24:17));
+  let fyOff=7;
+  if(d.tvsh>0){fyOff+=7;doc.text('TVSH (20%)',bx,fy+fyOff);doc.text(fmtModal(d.tvsh,curr),pw-14,fy+fyOff,{align:'right'});}
+  if(d.paguar>0){fyOff+=7;doc.setTextColor(22,163,74);doc.text('Paguar',bx,fy+fyOff);doc.text('-'+fmtModal(d.paguar,curr),pw-14,fy+fyOff,{align:'right'});}
+  doc.setLineWidth(.5);doc.setDrawColor(17,24,39);doc.line(bx,fy+fyOff+3,pw-14,fy+fyOff+3);
   doc.setTextColor(d.borxh>0?220:22,d.borxh>0?38:163,d.borxh>0?38:74);
   doc.setFontSize(13);doc.setFont('helvetica','bold');
-  const tyOff=d.paguar>0?33:26;
+  const tyOff=fyOff+12;
   doc.text('MBETET',bx,fy+tyOff);doc.text(fmtModal(d.borxh>0?d.borxh:0,curr),pw-14,fy+tyOff,{align:'right'});
 
   // STATUS BADGE
@@ -6086,4 +6670,3 @@ window.addEventListener('resize', initMobile);
 </script>
 </body>
 </html>
-Problemi me hapjen e search pas shtimit të produktit - Manus
