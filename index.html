@@ -1787,15 +1787,48 @@ async function sbLoad(){
 
 async function sbSave(){
   try {
-    await Promise.all([
+    // Merge shitjet, blerjet, shpenzimet IDs currently in memory
+    const shitjetIds = shitjet.map(s=>s.id).filter(Boolean);
+    const blerjetIds = blerjet.map(b=>b.id).filter(Boolean);
+    const shpenzimetIds = shpenzimet.map(s=>s.id).filter(Boolean);
+    const fatMetaFats = Object.keys(faturatMeta);
+
+    // Delete rows from Supabase that no longer exist in memory
+    const delOps = [];
+    if(shitjetIds.length > 0){
+      delOps.push(sb.from('shitjet').delete().not('id','in','('+shitjetIds.map(x=>`"${x}"`).join(',')+')'));
+    } else {
+      delOps.push(sb.from('shitjet').delete().neq('id','__none__'));
+    }
+    if(blerjetIds.length > 0){
+      delOps.push(sb.from('blerjet').delete().not('id','in','('+blerjetIds.map(x=>`"${x}"`).join(',')+')'));
+    } else {
+      delOps.push(sb.from('blerjet').delete().neq('id','__none__'));
+    }
+    if(shpenzimetIds.length > 0){
+      delOps.push(sb.from('shpenzimet').delete().not('id','in','('+shpenzimetIds.map(x=>`"${x}"`).join(',')+')'));
+    } else {
+      delOps.push(sb.from('shpenzimet').delete().neq('id','__none__'));
+    }
+    if(fatMetaFats.length > 0){
+      delOps.push(sb.from('faturat_meta').delete().not('fat','in','('+fatMetaFats.map(x=>`"${x}"`).join(',')+')'));
+    } else {
+      delOps.push(sb.from('faturat_meta').delete().neq('fat','__none__'));
+    }
+    await Promise.all(delOps);
+
+    // Upsert current data
+    const upsertOps = [
       sb.from('products').upsert(products),
-      sb.from('blerjet').upsert(blerjet),
-      sb.from('shitjet').upsert(shitjet),
-      sb.from('shpenzimet').upsert(shpenzimet),
       sb.from('users').upsert(users),
       sb.from('biz_cfg').upsert({id:1,emri:bizCfg.emri,nipt:bizCfg.nipt,tel:bizCfg.tel,adresa:bizCfg.adresa,footer:bizCfg.footer,pref_sh:bizCfg.prefSh,pref_bl:bizCfg.prefBl,pad:bizCfg.pad}),
-      ...Object.entries(faturatMeta).map(([fat,v])=>sb.from('faturat_meta').upsert({fat,status:v.status,paguar:v.paguar||0,borxh:v.borxh||0}))
-    ]);
+    ];
+    if(shitjet.length) upsertOps.push(sb.from('shitjet').upsert(shitjet));
+    if(blerjet.length) upsertOps.push(sb.from('blerjet').upsert(blerjet));
+    if(shpenzimet.length) upsertOps.push(sb.from('shpenzimet').upsert(shpenzimet));
+    if(fatMetaFats.length) upsertOps.push(...Object.entries(faturatMeta).map(([fat,v])=>sb.from('faturat_meta').upsert({fat,status:v.status,paguar:v.paguar||0,borxh:v.borxh||0})));
+    await Promise.all(upsertOps);
+
     console.log('✓ Supabase: të dhënat u ruajtën');
   } catch(e){ console.warn('⚠ Supabase save error:', e); }
 }
