@@ -670,7 +670,7 @@ select option{background:#fff}
           <div class="form-group"><label>Klienti (Opsionale)</label><input id="ds-kli" value="Klient" placeholder="Emri klientit"></div>
           <div class="form-group"><label>Mënyra Pagesës</label><select id="ds-pag" onchange="dsTogglePjeserisht()"><option>Cash</option><option>Debitor</option><option>Pjesërisht</option></select></div>
           <div class="form-group"><label>Valuta</label><select id="ds-curr" onchange="dsUpdateLabels()"><option value="ALL">Lekë (L)</option><option value="EUR">Euro (€)</option></select></div>
-          <div class="form-group"><label>TVSH (20%)</label><select id="ds-tvsh-opt" onchange="dsRenderCart()"><option value="po">Po</option><option value="jo">Jo</option></select></div>
+          <div class="form-group"><label>TVSH (20%)</label><select id="ds-tvsh-opt" onchange="dsRenderCart()"><option value="jo">Jo</option><option value="po">Po</option></select></div>
         </div>
         <div id="ds-pjeserisht-row" style="display:none;background:#f5f3ff;border:1px solid #ede9fe;border-radius:10px;padding:1rem;margin-bottom:1rem">
           <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#4c1d95;margin-bottom:.75rem">🟣 Pagesa Pjesërisht / Borxh</div>
@@ -1366,7 +1366,7 @@ select option{background:#fff}
           <div class="form-group" style="margin:0">
             <label style="font-size:11px;font-weight:700;color:#334155;display:block;margin-bottom:4px">TVSH</label>
             <select id="prev-tvsh-opt" onchange="renderPrevCart()" style="border:2px solid #e2e8f0;border-radius:9px;padding:9px 10px;font-size:13px;font-family:'Inter',sans-serif;color:#1e293b;font-weight:600;outline:none;width:100%;background:#fff">
-              <option value="po">Po (20%)</option><option value="jo">Jo</option>
+              <option value="jo">Jo</option><option value="po">Po (20%)</option>
             </select>
           </div>
         </div>
@@ -1432,7 +1432,7 @@ select option{background:#fff}
       <div class="form-group"><label>Klienti (Opsionale)</label><input id="s-kli" value="Klient" placeholder="Emri klientit"></div>
       <div class="form-group"><label>Mënyra Pagesës</label><select id="s-pag" onchange="togglePjesërisht()"><option>Cash</option><option>Debitor</option><option>Pjesërisht</option></select></div>
       <div class="form-group"><label>Valuta</label><select id="s-curr" onchange="updateShitjeLabels()"><option value="ALL">Lekë (L)</option><option value="EUR">Euro (€)</option></select></div>
-      <div class="form-group"><label>TVSH (20%)</label><select id="s-tvsh-opt" onchange="renderCart()"><option value="po">Po</option><option value="jo">Jo</option></select></div>
+      <div class="form-group"><label>TVSH (20%)</label><select id="s-tvsh-opt" onchange="renderCart()"><option value="jo">Jo</option><option value="po">Po</option></select></div>
     </div>
     <div id="pjeserisht-row" style="display:none;background:#f5f3ff;border:1px solid #ede9fe;border-radius:10px;padding:1rem;margin-bottom:1rem">
       <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#4c1d95;margin-bottom:.75rem">🟣 Pagesa Pjesërisht / Borxh</div>
@@ -1651,7 +1651,7 @@ select option{background:#fff}
       <div class="form-group"><label>Data *</label><input id="esh-data" type="date"></div>
       <div class="form-group"><label>Klienti *</label><input id="esh-kli" placeholder="Emri klientit"></div>
       <div class="form-group"><label>Mënyra Pagesës</label><select id="esh-pag"><option>Cash</option><option>Debitor</option><option>Pjesërisht</option><option>Preventiv</option></select></div>
-      <div class="form-group"><label>TVSH (20%)</label><select id="esh-tvsh-opt"><option value="po">Po</option><option value="jo">Jo</option></select></div>
+      <div class="form-group"><label>TVSH (20%)</label><select id="esh-tvsh-opt"><option value="jo">Jo</option><option value="po">Po</option></select></div>
       <div class="form-group"><label>Statusi</label><select id="esh-status"><option value="paguar">✓ Paguar</option><option value="papaguar">✗ Pa Paguar</option><option value="pjeserisht">◑ Pjesërisht</option><option value="preventiv">📝 Preventiv</option></select></div>
       <div class="form-group"><label>Borxhi Mbetur (L)</label><input id="esh-borxh" type="number" placeholder="0"></div>
       <div class="form-group"><label>Paguar (L)</label><input id="esh-paguar" type="number" placeholder="0"></div>
@@ -3410,7 +3410,7 @@ function openEditShitjeModal(fat){
   document.getElementById('esh-data').value=sh?.data||meta.data||'';
   document.getElementById('esh-kli').value=sh?.kli||meta.kli||'';
   document.getElementById('esh-pag').value=sh?.pag||meta.pag||'Cash';
-  document.getElementById('esh-tvsh-opt').value=meta.tvshOpt||'po';
+  document.getElementById('esh-tvsh-opt').value=meta.tvshOpt||'jo';
   document.getElementById('esh-status').value=meta.status||'paguar';
   document.getElementById('esh-borxh').value=meta.borxh||0;
   document.getElementById('esh-paguar').value=meta.paguar||0;
@@ -3481,7 +3481,7 @@ function openPreventivModal(){
   document.getElementById('prev-cms').value='';
   document.getElementById('prev-sasia').value='1';
   document.getElementById('prev-curr').value='ALL';
-  document.getElementById('prev-tvsh-opt').value='po';
+  document.getElementById('prev-tvsh-opt').value='jo';
   document.getElementById('modal-preventiv').classList.add('open');
   document.addEventListener('click', closeProdDropdownPrev, true);
   updatePrevHeader();
@@ -3688,7 +3688,7 @@ function dsResetForm(){
   document.getElementById('ds-paguar').value='';
   document.getElementById('ds-borxh').value='';
   document.getElementById('ds-curr').value='ALL';
-  document.getElementById('ds-tvsh-opt').value='po';
+  document.getElementById('ds-tvsh-opt').value='jo';
   document.getElementById('ds-kli').value='';
   document.getElementById('ds-fat').value=nextFatNr('sh');
   document.addEventListener('click', dsCloseProdDropdown, true);
@@ -5038,8 +5038,9 @@ function doKonvertoPreventiv(fat, klienti, dataFat, totalFat){
     if(p) p.stok -= s.sasia;
   });
 
-  // 4. Regjistro arkëtim nëse ka pagesë
-  if(paguar > 0){
+  // 4. Regjistro arkëtim VETËM nëse është Debitor/Pjesërisht (jo Cash)
+  // Cash-i llogaritet direkt nga shitjet në xhiro, jo si arkëtim
+  if(paguar > 0 && pagTip !== 'Cash'){
     arketimet.push({ id:'ARK-'+Date.now(), fat, kli:klienti, dataFat, data:today(), ts:Date.now(), shuma:paguar });
     localStorage.setItem('tp_arketimet', JSON.stringify(arketimet));
   }
@@ -5058,7 +5059,7 @@ function markPaguar(fat) {
   const totFat = shitjet.filter(s=>s&&s.fat===fat).reduce((s,x)=>s+(x.sasia||0)*(x.cms||0),0);
   const kaTVSH = meta.tvshOpt==='po';
   const totalFat = kaTVSH ? totFat*1.2 : totFat;
-  const borxhAktual = (meta.borxh > 0) ? meta.borxh : totalFat;
+  const borxhAktual = (Number(meta.borxh) > 0) ? Number(meta.borxh) : Math.max(0, totalFat - Number(meta.paguar || 0));
   const klienti = (shitjet.find(s=>s.fat===fat)||{}).kli || fat;
   const dataFat = (shitjet.find(s=>s.fat===fat)||{}).data || '';
 
@@ -5068,35 +5069,35 @@ function markPaguar(fat) {
 
   const dlg = document.createElement('div');
   dlg.id = 'dlg-ark';
-  dlg.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.48);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem';
+  dlg.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem';
   dlg.innerHTML = `
-    <div style="background:#fff;border-radius:18px;padding:1.75rem 1.75rem 1.5rem;width:390px;max-width:96vw;box-shadow:0 20px 60px rgba(0,0,0,.3);animation:loginPop .25s cubic-bezier(.16,1,.3,1)">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem">
+    <div style="background:#fff;border-radius:18px;padding:1.75rem;width:400px;max-width:96vw;box-shadow:0 20px 60px rgba(0,0,0,.3);animation:loginPop .25s cubic-bezier(.16,1,.3,1)">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.25rem">
         <div>
-          <div style="font-size:15px;font-weight:800;color:var(--text)">💵 Arkëtim Pagese</div>
+          <div style="font-size:15px;font-weight:800;color:var(--text)">💰 Arkëtim Pagese Debitori</div>
           <div style="font-size:12px;color:var(--text3);margin-top:3px">${fat} &nbsp;·&nbsp; <b style="color:var(--text)">${klienti}</b></div>
         </div>
-        <button onclick="document.getElementById('dlg-ark').remove()" style="background:var(--bg);border:none;width:28px;height:28px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--text3);flex-shrink:0">✕</button>
+        <button onclick="document.getElementById('dlg-ark').remove()" style="background:var(--bg);border:none;width:28px;height:28px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--text3)">✕</button>
       </div>
       <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:11px;padding:.85rem 1.1rem;margin-bottom:1.25rem;display:flex;justify-content:space-between;align-items:center">
-        <span style="font-size:12px;color:#7c3aed;font-weight:600">🔴 Borxhi mbetur</span>
+        <span style="font-size:12px;color:#dc2626;font-weight:600">🔴 Borxhi mbetur</span>
         <span style="font-size:17px;font-weight:800;color:#dc2626">${fmtL(borxhAktual)}</span>
       </div>
-      <div style="display:flex;flex-direction:column;gap:.85rem">
+      <div style="display:flex;flex-direction:column;gap:.75rem">
         <button onclick="doArkFull('${fat}','${klienti}','${dataFat}',${borxhAktual})"
-          style="background:linear-gradient(135deg,#22c55e,#16a34a);border:none;color:#fff;border-radius:11px;padding:13px 16px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;text-align:left;display:flex;justify-content:space-between;align-items:center">
+          style="width:100%;background:linear-gradient(135deg,#22c55e,#16a34a);border:none;color:#fff;border-radius:11px;padding:13px 16px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;display:flex;justify-content:space-between;align-items:center">
           <span>✓ Pagoi Plotësisht</span>
-          <span style="font-size:13px;opacity:.9">${fmtL(borxhAktual)}</span>
+          <span style="font-size:13px;opacity:.9;background:rgba(255,255,255,.2);border-radius:7px;padding:3px 10px">${fmtL(borxhAktual)}</span>
         </button>
-        <div style="border:1.5px solid var(--border);border-radius:11px;padding:.9rem 1rem;background:#fafbff">
-          <div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.6rem">💰 Shuma e Saktë (pjesërisht):</div>
+        <div style="background:#f5f3ff;border:1px solid #ede9fe;border-radius:11px;padding:.9rem 1rem">
+          <div style="font-size:11px;font-weight:700;color:#4c1d95;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.6rem">◑ Shuma e Saktë (pjesërisht)</div>
           <div style="display:flex;gap:.5rem">
             <input id="ark-shuma-input" type="number" placeholder="Shuma (L)" step="1" min="1"
-              style="flex:1;border:1.5px solid var(--border);border-radius:9px;padding:9px 12px;font-size:14px;font-family:'Inter',sans-serif;outline:none;transition:border-color .15s"
-              onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"
+              style="flex:1;border:1.5px solid #ede9fe;border-radius:9px;padding:10px 12px;font-size:15px;font-weight:700;font-family:'Inter',sans-serif;outline:none;color:#1e293b"
+              onfocus="this.style.borderColor='#7c3aed'" onblur="this.style.borderColor='#ede9fe'"
               onkeydown="if(event.key==='Enter')doArkPartial('${fat}','${klienti}','${dataFat}',${borxhAktual})">
             <button onclick="doArkPartial('${fat}','${klienti}','${dataFat}',${borxhAktual})"
-              style="background:var(--accent);border:none;color:#fff;border-radius:9px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap">
+              style="background:linear-gradient(135deg,#7c3aed,#4f6ef7);border:none;color:#fff;border-radius:9px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap">
               Regjistro
             </button>
           </div>
@@ -5672,7 +5673,7 @@ function renderDebitoret(){
               ${m.afat ? `<span style="color:${skad?'#dc2626':skadSoon?'#d97706':'#7c3aed'}">📅 ${m.afat}${skad?' ⚠':skadSoon?' ⏰':''}</span>` : ''}
             </div>
             <div style="display:flex;gap:.4rem;flex-wrap:wrap">
-              <button class="btn btn-success btn-sm" style="flex:1" onclick="markPaguar('${fat}')">✓ Pagoi</button>
+              <button class="btn btn-sm" style="flex:1;background:linear-gradient(135deg,#f59e0b,#d97706);border-color:#d97706;color:#fff;font-weight:700" onclick="markPaguar('${fat}')">💵 Paguaj</button>
               <button class="btn btn-outline btn-sm" onclick="showFatureByFat('${fat}')">🧾</button>
               <button class="btn btn-outline btn-sm" onclick="openEditShitjeModal('${fat}')">✏️</button>
               <button class="btn btn-outline btn-sm" onclick="openEditAfatModal('${fat}')">📅</button>
@@ -5732,7 +5733,7 @@ function renderDebitoret(){
         <td>${statusBadge(m.status||'papaguar')}</td>
         <td>
           <div style="display:flex;gap:4px;align-items:center">
-            <button class="btn btn-success btn-sm" onclick="markPaguar('${fat}')">✓ Pagoi</button>
+            <button class="btn btn-sm" style="background:linear-gradient(135deg,#f59e0b,#d97706);border-color:#d97706;color:#fff;font-weight:700" onclick="markPaguar('${fat}')">💵 Paguaj</button>
             <button class="btn btn-outline btn-sm" title="Shiko Faturën" onclick="showFatureByFat('${fat}')">🧾</button>
             <button class="btn btn-outline btn-sm" title="Edito" onclick="openEditShitjeModal('${fat}')">✏️</button>
             <button class="btn btn-outline btn-sm" title="Ndrysho Afatin" onclick="openEditAfatModal('${fat}')">📅</button>
