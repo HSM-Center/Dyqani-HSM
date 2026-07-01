@@ -1239,7 +1239,7 @@ select option{background:#fff}
       <div class="form-group"><label>Çmimi Shitjes 1 (L) *</label><input id="p-cms" type="number" placeholder="0"></div>
       <div class="form-group"><label>Çmimi Shitjes 2 (L)</label><input id="p-cms2" type="number" placeholder="(opsionale)"></div>
       <div class="form-group"><label>Stoku Fillestar *</label><input id="p-stok" type="number" placeholder="0"></div>
-      <div class="form-group"><label>Stok Minimal</label><input id="p-min" type="number" value="5"></div>
+      <div class="form-group"><label>Stok Minimal</label><input id="p-min" type="number" value="1"></div>
       <div class="form-group" style="grid-column:1/-1"><label>URL Foto (opsionale)</label><input id="p-foto" placeholder="https://..."></div>
     </div>
     <div class="form-actions">
@@ -1603,7 +1603,7 @@ select option{background:#fff}
   <div class="modal-box">
     <div class="modal-header"><div class="modal-title">✏ Ndrysho Produktin</div><div style="display:flex;gap:8px;align-items:center"><button class="modal-close" title="Maksimizo" onclick="toggleMaximize('modal-editprod',this)">□</button><button class="modal-close" title="Minimizo" onclick="minimizeModal('modal-editprod','✏ Ndrysho Produkt')">—</button><button class="modal-close" onclick="closeModalById('modal-editprod')">×</button></div></div>
     <div class="form-grid">
-      <div class="form-group"><label>Kodi *</label><input id="ep-id" placeholder="P001"></div>
+      <div class="form-group"><label>Kodi</label><input id="ep-id" readonly style="background:#f8fafc;color:var(--text3)"></div>
       <div class="form-group"><label>Emri *</label><input id="ep-name" placeholder="Emri i produktit"></div>
       <div class="form-group"><label>Kategoria</label><input id="ep-kat" placeholder="Laptop, Kamera..."></div>
       <div class="form-group"><label>Njësia</label><select id="ep-nje"><option>Cope</option><option>Kuti</option><option>Set</option><option>Metër</option><option>Paketë</option><option>Licencë</option></select></div>
@@ -1611,7 +1611,7 @@ select option{background:#fff}
       <div class="form-group"><label>Çmimi Shitjes 1 (L)</label><input id="ep-cms" type="number" placeholder="0"></div>
       <div class="form-group"><label>Çmimi Shitjes 2 (L)</label><input id="ep-cms2" type="number" placeholder="(opsionale)"></div>
       <div class="form-group"><label>Stoku Aktual</label><input id="ep-stok" type="number" placeholder="0"></div>
-      <div class="form-group"><label>Stok Minimal</label><input id="ep-min" type="number" placeholder="5"></div>
+      <div class="form-group"><label>Stok Minimal</label><input id="ep-min" type="number" placeholder="1"></div>
       <div class="form-group" style="grid-column:1/-1"><label>URL Foto (opsionale)</label><input id="ep-foto" placeholder="https://..."></div>
     </div>
     <div class="form-actions">
@@ -3260,7 +3260,7 @@ function addProduct(){
   const stok=+document.getElementById('p-stok').value;
   if(!id||!name||!cmb||!cms){alert('Plotëso fushat e detyrueshme!');return;}
   if(products.find(p=>p.id===id)){alert('Kodi ekziston tashmë!');return;}
-  products.push({id,name,kat:document.getElementById('p-kat').value||'Tjetër',nje:document.getElementById('p-nje').value,cmb,cms,cms2,stok,min:+document.getElementById('p-min').value||5,foto:document.getElementById('p-foto').value||''});
+  products.push({id,name,kat:document.getElementById('p-kat').value||'Tjetër',nje:document.getElementById('p-nje').value,cmb,cms,cms2,stok,min:+document.getElementById('p-min').value||1,foto:document.getElementById('p-foto').value||''});
   save();closeModalById('modal-addprod');renderAll();
   ['p-id','p-name','p-kat','p-cmb','p-cms','p-cms2','p-stok','p-foto'].forEach(x=>document.getElementById(x).value='');
   document.getElementById('p-min').value='5';
@@ -3312,7 +3312,6 @@ function openEditProdModal(id){
   const p=getProd(id);
   if(!p)return;
   document.getElementById('ep-id').value=p.id;
-  document.getElementById('ep-id').dataset.origId=p.id;
   document.getElementById('ep-name').value=p.name;
   document.getElementById('ep-kat').value=p.kat||'';
   document.getElementById('ep-nje').value=p.nje||'Cope';
@@ -3324,18 +3323,14 @@ function openEditProdModal(id){
   document.getElementById('ep-foto').value=p.foto||'';
   document.getElementById('modal-editprod').classList.add('open');
 }
-async function saveEditProd(){
-  const origId=document.getElementById('ep-id').dataset.origId;
-  const p=getProd(origId);
+function saveEditProd(){
+  const id=document.getElementById('ep-id').value;
+  const p=getProd(id);
   if(!p)return;
-  const newId=document.getElementById('ep-id').value.trim();
   const name=document.getElementById('ep-name').value.trim();
   const cmb=+document.getElementById('ep-cmb').value;
   const cms=+document.getElementById('ep-cms').value;
-  if(!newId||!name||!cmb||!cms){alert('Plotëso fushat e detyrueshme!');return;}
-  if(newId!==origId && products.find(pr=>pr.id===newId)){alert('Kodi ekziston tashmë!');return;}
-  const idChanged = newId!==origId;
-  p.id=newId;
+  if(!name||!cmb||!cms){alert('Plotëso fushat e detyrueshme!');return;}
   p.name=name;
   p.kat=document.getElementById('ep-kat').value||'Tjetër';
   p.nje=document.getElementById('ep-nje').value;
@@ -3343,11 +3338,8 @@ async function saveEditProd(){
   p.cms=cms;
   p.cms2=+document.getElementById('ep-cms2').value||0;
   p.stok=+document.getElementById('ep-stok').value||0;
-  p.min=+document.getElementById('ep-min').value||5;
+  p.min=+document.getElementById('ep-min').value||1;
   p.foto=document.getElementById('ep-foto').value||'';
-  if(idChanged){
-    try{await sb.from('products').delete().eq('id',origId);}catch(e){console.warn('⚠ Supabase delete error:',e);}
-  }
   save();closeModalById('modal-editprod');renderAll();
 }
 async function deleteProduct(id){if(!confirm('Fshi produktin '+id+'?'))return;products=products.filter(p=>p.id!==id);try{await sb.from('products').delete().eq('id',id);}catch(e){console.warn('⚠ Supabase delete error:',e);}save();renderAll();}
@@ -4305,7 +4297,7 @@ function handleExcelFile(input){
           cmb: parseNum(row['Kosto'] || row['Kosto (L)'] || row['Cmimi Blerjes'] || row['cmb']),
           cms: parseNum(row['Çmimi'] || row['Çmimi (L)'] || row['Cmimi Shitjes'] || row['cms']),
           stok: parseNum(row['Sasia'] || row['Stoku'] || row['stok']),
-          min: parseNum(row['Sasia Kritike'] || row['Stok Minimal'] || row['min']),
+          min: parseNum(row['Sasia Kritike'] || row['Stok Minimal'] || row['min']) || 1,
           foto: (row['Foto'] || row['foto'] || '').toString()
         };
         
@@ -5980,7 +5972,28 @@ function doRestore(data){
   alert('✅ Backup-i u rikthye me sukses! Çdo e dhënë (produkte, fatura, shitje, blerje, debitorë, shpenzime, përdorues, xhiro, konfigurime) u rifreskua.');
 }
 
+function showBackupNotif(msg){
+  const notif = document.createElement('div');
+  notif.innerHTML = msg+' <span onclick="this.parentNode.remove()" style="cursor:pointer;float:right">×</span>';
+  notif.style.cssText = 'position:fixed;bottom:1rem;right:1rem;background:#f0fdf4;border:1px solid #bbf7d0;color:#16a34a;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.1)';
+  document.body.appendChild(notif);
+  setTimeout(()=>notif.remove(), 6000);
+}
+
+async function autoBackupNewBrowserCheck(){
+  // Nëse ky browser/pajisje nuk e ka hapur më parë këtë sistem, shkarko automatikisht
+  // një backup JSON të plotë (të dhënat vijnë tashmë nga baza e të dhënave në cloud).
+  const marked = localStorage.getItem('tp_browser_marked');
+  if(!marked){
+    localStorage.setItem('tp_browser_marked', '1');
+    console.log('Browser i ri i zbuluar — duke shkarkuar backup automatik...');
+    await doBackup(true);
+    showBackupNotif('💾 Browser/pajisje e re — backup automatik u shkarkua!');
+  }
+}
+
 async function autoBackupCheck(){
+  await autoBackupNewBrowserCheck();
   const last = localStorage.getItem('tp_last_backup')||'';
   const now = new Date();
   const firstOfMonth = now.getDate()===1;
@@ -5989,11 +6002,7 @@ async function autoBackupCheck(){
   if(firstOfMonth && lastMonth !== thisMonth){
     console.log('Auto-backup çdo fillim muaji...');
     await doBackup(true);
-    const notif = document.createElement('div');
-    notif.innerHTML = '💾 Auto-backup i muajit u krye! <span onclick="this.parentNode.remove()" style="cursor:pointer;float:right">×</span>';
-    notif.style.cssText = 'position:fixed;bottom:1rem;right:1rem;background:#f0fdf4;border:1px solid #bbf7d0;color:#16a34a;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.1)';
-    document.body.appendChild(notif);
-    setTimeout(()=>notif.remove(), 6000);
+    showBackupNotif('💾 Auto-backup i muajit u krye!');
   }
 }
 function renderBilanci(){
