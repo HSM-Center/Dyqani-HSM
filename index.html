@@ -3263,7 +3263,7 @@ function addProduct(){
   products.push({id,name,kat:document.getElementById('p-kat').value||'Tjetër',nje:document.getElementById('p-nje').value,cmb,cms,cms2,stok,min:+document.getElementById('p-min').value||1,foto:document.getElementById('p-foto').value||''});
   save();closeModalById('modal-addprod');renderAll();
   ['p-id','p-name','p-kat','p-cmb','p-cms','p-cms2','p-stok','p-foto'].forEach(x=>document.getElementById(x).value='');
-  document.getElementById('p-min').value='5';
+  document.getElementById('p-min').value='1';
 }
 function openQuickStok(id){
   const p = getProd(id);
@@ -4297,7 +4297,7 @@ function handleExcelFile(input){
           cmb: parseNum(row['Kosto'] || row['Kosto (L)'] || row['Cmimi Blerjes'] || row['cmb']),
           cms: parseNum(row['Çmimi'] || row['Çmimi (L)'] || row['Cmimi Shitjes'] || row['cms']),
           stok: parseNum(row['Sasia'] || row['Stoku'] || row['stok']),
-          min: parseNum(row['Sasia Kritike'] || row['Stok Minimal'] || row['min']) || 1,
+          min: parseNum(row['Sasia Kritike'] || row['Stok Minimal'] || row['min']),
           foto: (row['Foto'] || row['foto'] || '').toString()
         };
         
@@ -5972,28 +5972,7 @@ function doRestore(data){
   alert('✅ Backup-i u rikthye me sukses! Çdo e dhënë (produkte, fatura, shitje, blerje, debitorë, shpenzime, përdorues, xhiro, konfigurime) u rifreskua.');
 }
 
-function showBackupNotif(msg){
-  const notif = document.createElement('div');
-  notif.innerHTML = msg+' <span onclick="this.parentNode.remove()" style="cursor:pointer;float:right">×</span>';
-  notif.style.cssText = 'position:fixed;bottom:1rem;right:1rem;background:#f0fdf4;border:1px solid #bbf7d0;color:#16a34a;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.1)';
-  document.body.appendChild(notif);
-  setTimeout(()=>notif.remove(), 6000);
-}
-
-async function autoBackupNewBrowserCheck(){
-  // Nëse ky browser/pajisje nuk e ka hapur më parë këtë sistem, shkarko automatikisht
-  // një backup JSON të plotë (të dhënat vijnë tashmë nga baza e të dhënave në cloud).
-  const marked = localStorage.getItem('tp_browser_marked');
-  if(!marked){
-    localStorage.setItem('tp_browser_marked', '1');
-    console.log('Browser i ri i zbuluar — duke shkarkuar backup automatik...');
-    await doBackup(true);
-    showBackupNotif('💾 Browser/pajisje e re — backup automatik u shkarkua!');
-  }
-}
-
 async function autoBackupCheck(){
-  await autoBackupNewBrowserCheck();
   const last = localStorage.getItem('tp_last_backup')||'';
   const now = new Date();
   const firstOfMonth = now.getDate()===1;
@@ -6002,7 +5981,11 @@ async function autoBackupCheck(){
   if(firstOfMonth && lastMonth !== thisMonth){
     console.log('Auto-backup çdo fillim muaji...');
     await doBackup(true);
-    showBackupNotif('💾 Auto-backup i muajit u krye!');
+    const notif = document.createElement('div');
+    notif.innerHTML = '💾 Auto-backup i muajit u krye! <span onclick="this.parentNode.remove()" style="cursor:pointer;float:right">×</span>';
+    notif.style.cssText = 'position:fixed;bottom:1rem;right:1rem;background:#f0fdf4;border:1px solid #bbf7d0;color:#16a34a;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.1)';
+    document.body.appendChild(notif);
+    setTimeout(()=>notif.remove(), 6000);
   }
 }
 function renderBilanci(){
