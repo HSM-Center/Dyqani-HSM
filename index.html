@@ -543,6 +543,8 @@ select option{background:#fff}
   .fature-footer [style*="justify-content:space-between"]{flex-direction:column!important;gap:4px!important}
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+<script>eruda.init();</script>
 </head>
 <body>
 
@@ -1799,48 +1801,76 @@ async function sbLoad(){
 
 async function sbSave(){
   _sbPending++;
+  // Nëse ka dy a më shumë rreshta me të njëjtin ID, Supabase e refuzon TË GJITHË
+  // upsert-in (jo vetëm rreshtin problematik). E pastrojmë këtu, duke mbajtur
+  // gjithmonë kopjen e fundit (më të freskët) të secilit ID.
+  function dedupeById(arr, key){
+    const map = new Map();
+    for(const item of arr){ if(item && item[key]!==undefined && item[key]!==null) map.set(String(item[key]), item); }
+    return Array.from(map.values());
+  }
   try {
+    products = dedupeById(products,'id');
+    users = dedupeById(users,'username');
+    shitjet = dedupeById(shitjet,'id');
+    blerjet = dedupeById(blerjet,'id');
+    shpenzimet = dedupeById(shpenzimet,'id');
     // Merge shitjet, blerjet, shpenzimet IDs currently in memory
     const shitjetIds = shitjet.map(s=>s.id).filter(Boolean);
     const blerjetIds = blerjet.map(b=>b.id).filter(Boolean);
     const shpenzimetIds = shpenzimet.map(s=>s.id).filter(Boolean);
     const fatMetaFats = Object.keys(faturatMeta);
 
-    // Delete rows from Supabase that no longer exist in memory
+    // Delete rows from Supabase that no longer exist in memory.
+    // E RËNDËSISHME: nëse lista lokale është bosh (0 rreshta), NUK fshijmë gjithçka
+    // te Supabase — thjesht anashkalojmë fshirjen për këtë tabelë. Fshirja e plotë
+    // e një tabele bazuar vetëm te një gjendje kalimtare lokale bosh ishte shumë e rrezikshme.
     const delOps = [];
+    const delLabels = [];
     if(shitjetIds.length > 0){
       delOps.push(sb.from('shitjet').delete().not('id','in','('+shitjetIds.map(x=>`"${x}"`).join(',')+')'));
-    } else {
-      delOps.push(sb.from('shitjet').delete().neq('id','__none__'));
+      delLabels.push('shitjet(del)');
     }
     if(blerjetIds.length > 0){
       delOps.push(sb.from('blerjet').delete().not('id','in','('+blerjetIds.map(x=>`"${x}"`).join(',')+')'));
-    } else {
-      delOps.push(sb.from('blerjet').delete().neq('id','__none__'));
+      delLabels.push('blerjet(del)');
     }
     if(shpenzimetIds.length > 0){
       delOps.push(sb.from('shpenzimet').delete().not('id','in','('+shpenzimetIds.map(x=>`"${x}"`).join(',')+')'));
-    } else {
-      delOps.push(sb.from('shpenzimet').delete().neq('id','__none__'));
+      delLabels.push('shpenzimet(del)');
     }
     if(fatMetaFats.length > 0){
       delOps.push(sb.from('faturat_meta').delete().not('fat','in','('+fatMetaFats.map(x=>`"${x}"`).join(',')+')'));
-    } else {
-      delOps.push(sb.from('faturat_meta').delete().neq('fat','__none__'));
+      delLabels.push('faturat_meta(del)');
     }
-    await Promise.all(delOps);
+    const delResults = await Promise.allSettled(delOps);
+    delResults.forEach((r,i)=>{ if(r.status==='rejected' || r.value?.error) console.warn('⚠ Supabase DELETE dështoi te', delLabels[i], ':', r.reason||r.value.error); });
 
     // Upsert current data
+    const upsertLabels = ['products','users','biz_cfg'];
     const upsertOps = [
       sb.from('products').upsert(products),
       sb.from('users').upsert(users),
       sb.from('biz_cfg').upsert({id:1,emri:bizCfg.emri,nipt:bizCfg.nipt,tel:bizCfg.tel,adresa:bizCfg.adresa,footer:bizCfg.footer,pref_sh:bizCfg.prefSh,pref_bl:bizCfg.prefBl,pad:bizCfg.pad}),
     ];
-    if(shitjet.length) upsertOps.push(sb.from('shitjet').upsert(shitjet));
-    if(blerjet.length) upsertOps.push(sb.from('blerjet').upsert(blerjet));
-    if(shpenzimet.length) upsertOps.push(sb.from('shpenzimet').upsert(shpenzimet));
-    if(fatMetaFats.length) upsertOps.push(...Object.entries(faturatMeta).map(([fat,v])=>sb.from('faturat_meta').upsert({fat,status:v.status,paguar:v.paguar||0,borxh:v.borxh||0})));
-    await Promise.all(upsertOps);
+    if(shitjet.length){ upsertOps.push(sb.from('shitjet').upsert(shitjet)); upsertLabels.push('shitjet'); }
+    if(blerjet.length){ upsertOps.push(sb.from('blerjet').upsert(blerjet)); upsertLabels.push('blerjet'); }
+    if(shpenzimet.length){ upsertOps.push(sb.from('shpenzimet').upsert(shpenzimet)); upsertLabels.push('shpenzimet'); }
+    if(fatMetaFats.length){
+      Object.entries(faturatMeta).forEach(([fat,v])=>{
+        upsertOps.push(sb.from('faturat_meta').upsert({fat,status:v.status,paguar:v.paguar||0,borxh:v.borxh||0}));
+        upsertLabels.push('faturat_meta:'+fat);
+      });
+    }
+    const upsertResults = await Promise.allSettled(upsertOps);
+    const failed = [];
+    upsertResults.forEach((r,i)=>{
+      if(r.status==='rejected'){ console.warn('⚠ Supabase UPSERT dështoi te', upsertLabels[i], ':', r.reason); failed.push(upsertLabels[i]+': '+(r.reason?.message||r.reason)); }
+      else if(r.value?.error){ console.warn('⚠ Supabase UPSERT dështoi te', upsertLabels[i], ':', r.value.error); failed.push(upsertLabels[i]+': '+r.value.error.message); }
+    });
+    if(failed.length){
+      throw new Error('Dështoi ruajtja te: '+failed.join(' | '));
+    }
 
     console.log('✓ Supabase: të dhënat u ruajtën');
   } catch(e){
@@ -2279,39 +2309,11 @@ if(!users.find(u=>u.username==='admin')){
   users.unshift({username:'admin',password:'admin123',role:'admin'});
   localStorage.setItem('tp_users',JSON.stringify(users));
 }
-let products = JSON.parse(localStorage.getItem('tp_products')||'null')||[
-  { "id": "ART-001", "name": "Produkt Shembull 1", "kat": "Kategoria A", "nje": "Copë", "cmb": 500.0, "cms": 750.0, "stok": 50.0, "min": 10.0, "foto": "" },
-  { "id": "ART-002", "name": "Produkt Shembull 2", "kat": "Kategoria A", "nje": "Copë", "cmb": 1200.0, "cms": 1800.0, "stok": 30.0, "min": 5.0, "foto": "" },
-  { "id": "ART-003", "name": "Produkt Shembull 3", "kat": "Kategoria B", "nje": "Kg", "cmb": 200.0, "cms": 350.0, "stok": 100.0, "min": 20.0, "foto": "" },
-  { "id": "ART-004", "name": "Produkt Shembull 4", "kat": "Kategoria B", "nje": "Copë", "cmb": 3000.0, "cms": 4500.0, "stok": 15.0, "min": 3.0, "foto": "" },
-  { "id": "ART-005", "name": "Produkt Shembull 5", "kat": "Kategoria C", "nje": "Litër", "cmb": 80.0, "cms": 130.0, "stok": 200.0, "min": 30.0, "foto": "" },
-  { "id": "ART-006", "name": "Produkt Shembull 6", "kat": "Kategoria C", "nje": "Copë", "cmb": 5000.0, "cms": 7500.0, "stok": 8.0, "min": 2.0, "foto": "" },
-  { "id": "ART-007", "name": "Produkt Shembull 7", "kat": "Kategoria A", "nje": "Copë", "cmb": 650.0, "cms": 950.0, "stok": 45.0, "min": 8.0, "foto": "" },
-  { "id": "ART-008", "name": "Produkt Shembull 8", "kat": "Kategoria B", "nje": "Kg", "cmb": 300.0, "cms": 480.0, "stok": 60.0, "min": 15.0, "foto": "" },
-  { "id": "ART-009", "name": "Produkt Shembull 9", "kat": "Kategoria D", "nje": "Copë", "cmb": 1800.0, "cms": 2700.0, "stok": 25.0, "min": 5.0, "foto": "" },
-  { "id": "ART-010", "name": "Produkt Shembull 10", "kat": "Kategoria D", "nje": "Copë", "cmb": 150.0, "cms": 250.0, "stok": 120.0, "min": 25.0, "foto": "" }
-];
-let blerjet = JSON.parse(localStorage.getItem('tp_blerjet')||'null')||[
-  {id:"B001",fat:"F-BL-001",data:"2025-06-01",furn:"Tech Import SH.P.K",prod:"P001",sasia:5,cmb:65000},
-  {id:"B002",fat:"F-BL-001",data:"2025-06-01",furn:"Tech Import SH.P.K",prod:"P003",sasia:8,cmb:18000},
-  {id:"B003",fat:"F-BL-002",data:"2025-06-03",furn:"Digital World Albania",prod:"P005",sasia:10,cmb:4500},
-  {id:"B004",fat:"F-BL-002",data:"2025-06-03",furn:"Digital World Albania",prod:"P009",sasia:4,cmb:12000},
-  {id:"B005",fat:"F-BL-003",data:"2025-06-05",furn:"Network Solutions",prod:"P007",sasia:10,cmb:3500},
-];
-let shitjet = JSON.parse(localStorage.getItem('tp_shitjet')||'null')||[
-  {id:"S001",fat:"F-SH-001",data:"2025-06-01",kli:"Bashkim Hoxha",prod:"P001",sasia:2,cms:80000,pag:"Transfer"},
-  {id:"S002",fat:"F-SH-001",data:"2025-06-01",kli:"Bashkim Hoxha",prod:"P003",sasia:2,cms:24000,pag:"Transfer"},
-  {id:"S003",fat:"F-SH-002",data:"2025-06-02",kli:"Gëzim Leka",prod:"P005",sasia:4,cms:6500,pag:"Cash"},
-  {id:"S004",fat:"F-SH-002",data:"2025-06-02",kli:"Gëzim Leka",prod:"P009",sasia:1,cms:17000,pag:"Cash"},
-  {id:"S005",fat:"F-SH-003",data:"2025-06-03",kli:"Drita Shehu",prod:"P007",sasia:3,cms:5000,pag:"Kartë"},
-  {id:"S006",fat:"F-SH-004",data:"2025-06-04",kli:"Artan Muka",prod:"P012",sasia:2,cms:11500,pag:"Transfer"},
-];
+let products = JSON.parse(localStorage.getItem('tp_products')||'null')||[];
+let blerjet = JSON.parse(localStorage.getItem('tp_blerjet')||'null')||[];
+let shitjet = JSON.parse(localStorage.getItem('tp_shitjet')||'null')||[];
 let faturatMeta = JSON.parse(localStorage.getItem('tp_faturat_meta')||'null')||{};
-let shpenzimet = JSON.parse(localStorage.getItem('tp_shpenzimet')||'null')||[
-  {id:"SH001",data:"2025-06-01",kat:"Qiraja",pershkrim:"Qiraja e muajit Qershor",vlera:50000,pag:"Transfer"},
-  {id:"SH002",data:"2025-06-01",kat:"Pagat",pershkrim:"Pagat e stafit - Qershor",vlera:80000,pag:"Transfer"},
-  {id:"SH003",data:"2025-06-05",kat:"Energji Elektrike",pershkrim:"Fatura energjisë elektrike",vlera:8000,pag:"Cash"},
-];
+let shpenzimet = JSON.parse(localStorage.getItem('tp_shpenzimet')||'null')||[];
 
 // ============================================================
 // RAPORTI XHIRO DITORE
