@@ -543,10 +543,8 @@ select option{background:#fff}
   .fature-footer [style*="justify-content:space-between"]{flex-direction:column!important;gap:4px!important}
 }
 </style>
-<link rel="manifest" href="manifest.json">
-<link rel="icon" href="favicon.png" type="image/png">
-<link rel="apple-touch-icon" href="icon-192.png">
-<meta name="theme-color" content="#4f46e5">
+<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+<script>eruda.init();</script>
 </head>
 <body>
 
@@ -5574,15 +5572,28 @@ function deleteBlerjeFat(fat){
   save();renderAll();
 }
 
-function deleteShitje(fat){
+async function deleteShitje(fat){
   const meta=faturatMeta[fat]||{};
   const kli=meta.kli||fat;
   if(!confirm('⚠ Fshi shitjen '+fat+' ('+kli+')?\nStoku do të kthehet automatikisht.'))return;
   const items=shitjet.filter(s=>s.fat===fat);
+  const idsToDelete=items.map(s=>s.id).filter(Boolean);
   items.forEach(s=>{const p=products.find(x=>x.id===s.prod);if(p&&s.pag!=='Preventiv')p.stok+=s.sasia;});
   shitjet=shitjet.filter(s=>s.fat!==fat);
   if(faturatMeta[fat])delete faturatMeta[fat];
   save();renderAll();
+  // Fshirje DIREKTE te Supabase si masë sigurie — sbSave() e anashkalon fshirjen
+  // kur shitjet bëhet array bosh (rasti i shitjes së fundit), prandaj e bëjmë këtu shprehimisht.
+  if(idsToDelete.length){
+    try{
+      const {error}=await sb.from('shitjet').delete().in('id',idsToDelete);
+      if(error) console.warn('⚠ Supabase delete (shitje) error:',error);
+    }catch(e){ console.warn('⚠ Supabase delete (shitje) error:',e); }
+    try{
+      const {error:errMeta}=await sb.from('faturat_meta').delete().eq('fat',fat);
+      if(errMeta) console.warn('⚠ Supabase delete (faturat_meta) error:',errMeta);
+    }catch(e){ console.warn('⚠ Supabase delete (faturat_meta) error:',e); }
+  }
 }
 
 function eshTogglePjeserisht(){
