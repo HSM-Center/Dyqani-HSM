@@ -632,11 +632,26 @@ function renderBilanci(){
       <div class="bil-row"><span>Kosto e Mallrave</span><span style="font-weight:600;color:#dc2626">(${fmtL(totB)})</span></div>
       <div class="bil-row" style="border-top:2px solid #16a34a;padding-top:8px;margin-top:8px"><span style="font-weight:700">Fitimi Bruto</span><span style="font-weight:800;color:#16a34a;font-size:15px">${fmtL(fBruto)}</span></div>
     </div>`;
+  // Grupojmë blerjet sipas faturës për t'i shfaqur si rreshta shtesë (vetëm për pamje/informacion)
+  const blerjeByFat={};
+  filteredBlerjet.forEach(b=>{
+    if(!blerjeByFat[b.fat])blerjeByFat[b.fat]={fat:b.fat,furn:b.furn,data:b.data,total:0};
+    blerjeByFat[b.fat].total+=b.sasia*b.cmb;
+  });
+  const blerjeGrouped=Object.values(blerjeByFat);
+
   const shpenzimetHtml=`
     <div style="margin-bottom:1.5rem;padding:1rem;background:#fffbeb;border-radius:10px;border-left:4px solid #d97706">
       <div style="font-weight:700;color:#d97706;margin-bottom:.75rem;font-size:14px">SHPENZIMET OPERATIVE</div>
       ${filteredShpenzimet.length>0?filteredShpenzimet.map(sh=>`<div class="bil-row"><span>${sh.kat}: ${sh.pershkrim}</span><span style="font-weight:600;color:#dc2626">(${fmtL(sh.vlera)})</span></div>`).join(''):'<div style="font-size:12px;color:var(--text3);padding:4px 0">Nuk ka shpenzime për këtë periudhë</div>'}
-      <div class="bil-row" style="border-top:2px solid #d97706;padding-top:8px;margin-top:8px"><span style="font-weight:700">Total Shpenzime</span><span style="font-weight:800;color:#d97706;font-size:15px">(${fmtL(shpOp)})</span></div>
+      <div class="bil-row" style="border-top:2px solid #d97706;padding-top:8px;margin-top:8px"><span style="font-weight:700">Total Shpenzime Operative</span><span style="font-weight:800;color:#d97706;font-size:15px">(${fmtL(shpOp)})</span></div>
+      ${blerjeGrouped.length>0?`
+      <div style="margin-top:14px;padding-top:12px;border-top:1px dashed #fbbf24">
+        <div style="font-size:11px;font-weight:700;color:#b45309;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">📦 Blerjet (mallra për rishitje)</div>
+        ${blerjeGrouped.map(b=>`<div class="bil-row" style="opacity:.85"><span>${b.furn} — ${b.fat}</span><span style="font-weight:600;color:#dc2626">(${fmtL(b.total)})</span></div>`).join('')}
+        <div class="bil-row" style="padding-top:4px"><span style="font-weight:700;color:#b45309">Total Blerje</span><span style="font-weight:800;color:#b45309">(${fmtL(totB)})</span></div>
+        <div style="font-size:10.5px;color:var(--text3);margin-top:6px;font-style:italic">ℹ️ Blerjet llogariten te "Kosto e Mallrave" tek Fitimi Bruto më sipër — shfaqen këtu vetëm si informacion, pa u zbritur sërish nga fitimi.</div>
+      </div>`:''}
     </div>`;
   const fitimiNetoHtml=`
     <div style="padding:1rem;background:${fNeto>0?'#eff2fe':'#fef2f2'};border-radius:10px;border-left:4px solid ${fNeto>0?'#4f6ef7':'#dc2626'}">
