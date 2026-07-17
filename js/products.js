@@ -637,20 +637,37 @@ function renderMagazine(){
   }).join('');
 }
 
-function deleteBlerje(id){
+async function deleteBlerje(id){
   const b=blerjet.find(x=>x.id===id);
   const prodName=b?((getProd(b.prod)||{}).name||b.prod):'';
   if(!confirm('⚠ Fshi blerjen '+(b?b.fat:id)+(prodName?' — '+prodName:'')+'\nStoku do të ulet automatikisht.'))return;
   if(b){const p=products.find(x=>x.id===b.prod);if(p)p.stok=Math.max(0,p.stok-b.sasia);}
   blerjet=blerjet.filter(x=>x.id!==id);
   save();renderAll();
+  // Fshirje DIREKTE te Supabase si masë sigurie — sbSave() e anashkalon fshirjen
+  // kur blerjet bëhet array bosh (rasti i blerjes së fundit), prandaj e bëjmë këtu shprehimisht.
+  if(id){
+    try{
+      const {error}=await sb.from('blerjet').delete().eq('id',id);
+      if(error) console.warn('⚠ Supabase delete (blerje) error:',error);
+    }catch(e){ console.warn('⚠ Supabase delete (blerje) error:',e); }
+  }
 }
 
-function deleteBlerjeFat(fat){
+async function deleteBlerjeFat(fat){
   if(!confirm('Fshi të gjitha blerjet e faturës '+fat+'?'))return;
   const items=blerjet.filter(b=>b.fat===fat);
+  const idsToDelete=items.map(b=>b.id).filter(Boolean);
   items.forEach(b=>{const p=products.find(x=>x.id===b.prod);if(p)p.stok=Math.max(0,p.stok-b.sasia);});
   blerjet=blerjet.filter(b=>b.fat!==fat);
   save();renderAll();
+  // Fshirje DIREKTE te Supabase si masë sigurie — sbSave() e anashkalon fshirjen
+  // kur blerjet bëhet array bosh (rasti i blerjes së fundit), prandaj e bëjmë këtu shprehimisht.
+  if(idsToDelete.length){
+    try{
+      const {error}=await sb.from('blerjet').delete().in('id',idsToDelete);
+      if(error) console.warn('⚠ Supabase delete (blerje fat) error:',error);
+    }catch(e){ console.warn('⚠ Supabase delete (blerje fat) error:',e); }
+  }
 }
 
