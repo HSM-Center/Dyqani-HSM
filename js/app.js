@@ -485,13 +485,23 @@ function addShpenzim(){
 
 function renderShpenzimet(){
   const totSh=shpenzimet.reduce((s,x)=>s+x.vlera,0);
+  const totBl=blerjet.reduce((s,x)=>s+x.sasia*x.cmb,0);
   const kpi=document.getElementById('shp-kpi');
-  if(kpi)kpi.innerHTML=kpiCard('💸',fmtL(totSh),'Total Shpenzime','red','')+kpiCard('📄',shpenzimet.length,'Numri i Shpenzimeve','amber','');
+  if(kpi)kpi.innerHTML=kpiCard('💸',fmtL(totSh),'Total Shpenzime','red','')+kpiCard('📄',shpenzimet.length,'Numri i Shpenzimeve','amber','')+kpiCard('📦',fmtL(totBl),'Blerje (Kosto Mallrash)','amber','');
   const head=document.getElementById('shpenzime-head');
   const body=document.getElementById('shpenzime-body');
   if(!head||!body)return;
   head.innerHTML='<tr>'+['Data','Kategoria','Përshkrimi','Vlera','Pagesa',''].map(h=>`<th>${h}</th>`).join('')+'</tr>';
-  body.innerHTML=shpenzimet.slice().reverse().map(s=>`
+
+  // Grupojmë blerjet sipas faturës për t'i shfaqur si rreshta informues (nuk hyjnë te "Total Shpenzime")
+  const blerjeByFat={};
+  blerjet.forEach(b=>{
+    if(!blerjeByFat[b.fat])blerjeByFat[b.fat]={fat:b.fat,furn:b.furn,data:b.data,total:0};
+    blerjeByFat[b.fat].total+=b.sasia*b.cmb;
+  });
+  const blerjeGrouped=Object.values(blerjeByFat).sort((a,b)=>(a.data||'').localeCompare(b.data||''));
+
+  const shpenzimeRows=shpenzimet.slice().reverse().map(s=>`
     <tr>
       <td>${s.data}</td>
       <td>${badge(s.kat,'#fffbeb','#d97706')}</td>
@@ -502,7 +512,22 @@ function renderShpenzimet(){
         <button class="btn btn-outline btn-sm" onclick="openEditShpenzimModal('${s.id}')">✏</button>
         <button class="btn btn-danger btn-sm" onclick="deleteShpenzim('${s.id}')">🗑</button>
       </td>
-    </tr>`).join('')||'<tr><td colspan="6" style="color:var(--text3);text-align:center;padding:2rem">Nuk ka shpenzime të regjistruara.</td></tr>';
+    </tr>`).join('');
+
+  const blerjeSepRow=blerjeGrouped.length>0?`<tr><td colspan="6" style="background:linear-gradient(90deg,#fffbeb,transparent);padding:8px 14px;font-size:10.5px;font-weight:700;color:#b45309;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--border)">📦 Blerje (mallra për rishitje) — informacion, llogariten si Kosto Mallrash jo si Total Shpenzime</td></tr>`:'';
+  const blerjeRows=blerjeGrouped.slice().reverse().map(b=>`
+    <tr style="opacity:.85">
+      <td>${b.data}</td>
+      <td>${badge('Blerje','#fff7ed','#b45309')}</td>
+      <td style="font-weight:600;color:var(--text)">${b.furn} <span class="mono" style="font-size:11px;color:var(--text3)">(${b.fat})</span></td>
+      <td style="color:#dc2626;font-weight:700">${fmtL(b.total)}</td>
+      <td>${badge('Kosto Mallrash','#f3f4f6','#6b7280')}</td>
+      <td style="display:flex;gap:4px">
+        <button class="btn btn-outline btn-sm" onclick="showFatureByFat('${b.fat}')" title="Shiko Faturën">🧾</button>
+      </td>
+    </tr>`).join('');
+
+  body.innerHTML=(shpenzimeRows+blerjeSepRow+blerjeRows)||'<tr><td colspan="6" style="color:var(--text3);text-align:center;padding:2rem">Nuk ka shpenzime të regjistruara.</td></tr>';
 }
 
 function openEditShpenzimModal(id){
