@@ -603,11 +603,19 @@ function saveEditAfat(){
   save();closeModalById('modal-editafat');renderAll();
 }
 
-function deleteShpenzim(id){
+async function deleteShpenzim(id){
   const s=shpenzimet.find(x=>x.id===id);
   if(!confirm('⚠ Fshi shpenzimin: '+(s?'"'+s.pershkrim+'" — '+fmtL(s.vlera):id)+'?'))return;
   shpenzimet=shpenzimet.filter(s=>s.id!==id);
   save();renderAll();
+  // Fshirje DIREKTE te Supabase si masë sigurie — sbSave() e anashkalon fshirjen
+  // kur shpenzimet bëhet array bosh (rasti i shpenzimit të fundit), prandaj e bëjmë këtu shprehimisht.
+  if(id){
+    try{
+      const {error}=await sb.from('shpenzimet').delete().eq('id',id);
+      if(error) console.warn('⚠ Supabase delete (shpenzim) error:',error);
+    }catch(e){ console.warn('⚠ Supabase delete (shpenzim) error:',e); }
+  }
 }
 
 function buildBackupJSON(){
