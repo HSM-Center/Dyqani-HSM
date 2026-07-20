@@ -275,13 +275,15 @@ async function fetchExchangeRate(){
     if(data && data.rates && data.rates.ALL){
       exchangeRateEUR=data.rates.ALL;
       console.log('✓ Kursi i EUR/ALL: '+exchangeRateEUR);
-      const rateDisp = document.getElementById('exchange-rate-display');
-      if(rateDisp) rateDisp.textContent = `1 € = ${exchangeRateEUR.toFixed(2)} L`;
+      const rateVal = document.getElementById('exchange-rate-value');
+      if(rateVal) rateVal.textContent = exchangeRateEUR.toFixed(2);
       updateAllCurrencyLabels();
     }
   }catch(err){
     console.log('⚠ Gabim në marrjen e kursit: '+err.message);
     exchangeRateEUR=94.6;
+    const rateVal = document.getElementById('exchange-rate-value');
+    if(rateVal) rateVal.textContent = exchangeRateEUR.toFixed(2);
     updateAllCurrencyLabels();
   }
 }
