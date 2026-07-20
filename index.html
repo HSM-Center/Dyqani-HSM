@@ -10,6 +10,41 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <link rel="stylesheet" href="css/style.css">
+<style>
+/* --- FIX: butoni .sidebar-toggle ('‹') fshihej/mbivendosej mes sidebar-it
+   dhe topbar-it kur sidebar-i bie në layout horizontal (ekran i ngushtë).
+   E shkëputim nga pozicionimi absolute origjinal dhe e vendosim në rrjedhën
+   normale të .logo, në cepin e djathtë, gjithmonë e dukshme. */
+#sidebar .logo{
+  position: relative;
+  overflow: visible !important;
+}
+#sidebar .sidebar-toggle{
+  position: static !important;
+  inset: auto !important;
+  margin-left: auto !important;
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.12) !important;
+  color: #fff !important;
+  border: 1px solid rgba(255,255,255,0.18) !important;
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 5;
+}
+@media (max-width: 900px){
+  /* Kur sidebar-i shndërrohet në shirit horizontal, mos e lër topbar-in
+     ta mbulojë butonin: sigurojmë z-index dhe hapësirë të mjaftueshme. */
+  #sidebar{ overflow: visible !important; }
+  #sidebar .logo{ display:flex !important; align-items:center !important; gap:8px; }
+}
+</style>
 </head>
 <body>
 
