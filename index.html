@@ -132,7 +132,13 @@
       <input id="global-search" placeholder="Kërko produkt, klient, faturë..." oninput="globalSearch(this.value)">
     </div>
     <div class="topbar-right" style="display:flex;align-items:center;gap:1.25rem">
-      <div id="exchange-rate-display" style="font-size:12px;color:rgba(255,255,255,0.6);font-weight:600;background:rgba(255,255,255,0.05);padding:6px 12px;border-radius:8px">1 € = -- L</div>
+      <div id="exchange-rate-display" style="display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:rgba(255,255,255,0.85);background:rgba(255,255,255,0.06);padding:6px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);white-space:nowrap">
+        <span style="font-size:14px;line-height:1">💱</span>
+        <span style="color:rgba(255,255,255,0.55)">1 €</span>
+        <span style="color:rgba(255,255,255,0.35)">=</span>
+        <span id="exchange-rate-value" style="font-family:'JetBrains Mono',monospace;color:#fff;font-weight:700;letter-spacing:.3px">--</span>
+        <span style="color:rgba(255,255,255,0.55)">L</span>
+      </div>
       <div id="topbar-clock" style="font-size:16px;font-weight:700;color:#fff;min-width:100px;text-align:right;font-family:'JetBrains Mono',monospace;letter-spacing:1px;background:rgba(79,110,247,0.2);padding:6px 14px;border-radius:8px;border:1px solid rgba(79,110,247,0.3)">--:--:--</div>
       <select id="currency-selector" onchange="changeCurrency(this.value)" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:7px 12px;font-size:12px;font-weight:700;color:#fff;cursor:pointer;outline:none">
         <option value="ALL" style="color:#000">L (Lekë)</option>
