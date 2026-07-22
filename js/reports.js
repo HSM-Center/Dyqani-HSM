@@ -581,14 +581,15 @@ function exportArkivExcel(){
   const data=fatScopedCache.map(f=>{
     const meta=getFatureMeta(f.fat);
     const tvsh = meta.tvshOpt === 'po' ? f.vlera * 0.2 : 0;
+    const bazaPaTvsh = f.vlera - tvsh;
     return {
       'Nr. Faturës': f.fat,
       'Data': f.data,
       'Tipi': f.tipi,
       'Palë Tjetër': f.pale,
-      'Vlera': f.vlera,
+      'Vlera (Bazë pa TVSH)': bazaPaTvsh,
       'TVSH 20%': tvsh,
-      'Total + TVSH': f.vlera+tvsh,
+      'Total (me TVSH)': f.vlera,
       'Statusi': f.tipi==='Shitje'?getFatureStatus(f.fat):'paguar'
     };
   });
@@ -702,9 +703,10 @@ function showFatureByFat(fat){
       }
       return {name:name,kodi:s.prod,nje:nje,sasia:s.sasia,cm:cm,total:s.sasia*cm};
     });
-    const subtotal=items.reduce((s,i)=>s+i.total,0);
-    const tvsh = meta.tvshOpt === 'po' ? subtotal * 0.2 : 0;
-    currentFatureData={tipi:'SHITJEJE',fat,data:sh.data,pale:sh.kli,pag:sh.pag,items,subtotal,tvsh,total:subtotal+tvsh,status:meta.status||'paguar',paguar:(meta.paguar||0)/rate,borxh:(meta.borxh||0)/rate,afat:meta.afat||'',valuta:curr};
+    const grossTotal=items.reduce((s,i)=>s+i.total,0);
+    const tvsh = meta.tvshOpt === 'po' ? grossTotal * 0.2 : 0;
+    const subtotal = grossTotal - tvsh;
+    currentFatureData={tipi:'SHITJEJE',fat,data:sh.data,pale:sh.kli,pag:sh.pag,items,subtotal,tvsh,total:grossTotal,status:meta.status||'paguar',paguar:(meta.paguar||0)/rate,borxh:(meta.borxh||0)/rate,afat:meta.afat||'',valuta:curr};
   }else{
     const allBl=blerjet.filter(b=>b.fat===fat);
     const bl=allBl[0];
@@ -713,9 +715,10 @@ function showFatureByFat(fat){
       const cm = b.cmb / rate;
       return {name:p?p.name:b.prod,kodi:b.prod,nje:p?p.nje:'',sasia:b.sasia,cm:cm,total:b.sasia*cm};
     });
-    const subtotal=items.reduce((s,i)=>s+i.total,0);
-    const tvsh = meta.tvshOpt === 'po' ? subtotal * 0.2 : 0;
-    currentFatureData={tipi:'BLERJES',fat,data:bl.data,pale:bl.furn,pag:'Transfer',items,subtotal,tvsh,total:subtotal+tvsh,status:'paguar',paguar:subtotal+tvsh,borxh:0,afat:'',valuta:curr};
+    const grossTotal=items.reduce((s,i)=>s+i.total,0);
+    const tvsh = meta.tvshOpt === 'po' ? grossTotal * 0.2 : 0;
+    const subtotal = grossTotal - tvsh;
+    currentFatureData={tipi:'BLERJES',fat,data:bl.data,pale:bl.furn,pag:'Transfer',items,subtotal,tvsh,total:grossTotal,status:'paguar',paguar:grossTotal,borxh:0,afat:'',valuta:curr};
   }
   showFatureInline();
 }
