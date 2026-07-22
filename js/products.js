@@ -94,10 +94,11 @@ function renderBlerjeCart(){
       <td><button class="btn btn-danger btn-sm" onclick="blerjeCartRemove(${i})">✕</button></td>
     </tr>`).join('')}
   </tbody></table>`;
-  const subtot=blerjeCart.reduce((s,c)=>s+c.total,0);
+  const grossTotal=blerjeCart.reduce((s,c)=>s+c.total,0);
   const tvshOpt = document.getElementById('b-tvsh-opt').value;
-  const tvsh = tvshOpt === 'po' ? subtot * 0.2 : 0;
-  const total = subtot + tvsh;
+  const tvsh = tvshOpt === 'po' ? grossTotal * 0.2 : 0;
+  const subtot = grossTotal - tvsh;
+  const total = grossTotal;
   tot.innerHTML=`Nëntotali: <strong>${fmtModal(subtot, curr)}</strong> &nbsp;|&nbsp; TVSH: <strong>${fmtModal(tvsh, curr)}</strong> &nbsp;|&nbsp; <span style="color:var(--accent);font-size:15px">TOTAL: ${fmtModal(total, curr)}</span>`;
 }
 
@@ -270,9 +271,10 @@ async function addBlerje(){
   renderAll();
   document.getElementById('b-furn').value='';
   const items=cartSnapshot.map(c=>({name:c.name,kodi:c.prodId,nje:c.nje,sasia:c.sasia,cm:c.cmb,total:c.total}));
-  const subtotal=cartSnapshot.reduce((s,c)=>s+c.total,0);
-  const tvsh = tvshOpt==='po' ? subtotal*0.2 : 0;
-  currentFatureData={tipi:'BLERJES',fat,data,pale:furn,pag:'Transfer',items,subtotal,tvsh,total:subtotal+tvsh,status:'paguar',paguar:subtotal+tvsh,borxh:0,afat:'',valuta:curr};
+  const grossTotal=cartSnapshot.reduce((s,c)=>s+c.total,0);
+  const tvsh = tvshOpt==='po' ? grossTotal*0.2 : 0;
+  const subtotal = grossTotal - tvsh;
+  currentFatureData={tipi:'BLERJES',fat,data,pale:furn,pag:'Transfer',items,subtotal,tvsh,total:grossTotal,status:'paguar',paguar:grossTotal,borxh:0,afat:'',valuta:curr};
   showFatureInline();
 }
 
