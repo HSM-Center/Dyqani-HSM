@@ -618,8 +618,7 @@ function renderBilanci(){
   const fBruto=totS-totB;
   const shpOp=filteredShpenzimet.reduce((s,x)=>s+x.vlera,0);
   const fOp=fBruto-shpOp;
-  const tvsh=totS*.2;
-  const fNeto=fOp-tvsh;
+  const fNeto=fOp;
   document.getElementById('bil-kpi').innerHTML=
     kpiCard('💰',fmtL(totS),'Xhiro','green','')+
     kpiCard('📦',fmtL(totB),'Kosto Mallrash','amber','')+
@@ -656,8 +655,6 @@ function renderBilanci(){
   const fitimiNetoHtml=`
     <div style="padding:1rem;background:${fNeto>0?'#eff2fe':'#fef2f2'};border-radius:10px;border-left:4px solid ${fNeto>0?'#4f6ef7':'#dc2626'}">
       <div style="font-weight:700;color:${fNeto>0?'#4f6ef7':'#dc2626'};margin-bottom:.75rem;font-size:14px">FITIMI NETO</div>
-      <div class="bil-row"><span>Fitimi Operacional</span><span style="font-weight:600;color:${fOp>0?'#16a34a':'#dc2626'}">${fOp>0?fmtL(fOp):'('+fmtL(-fOp)+')'}</span></div>
-      <div class="bil-row"><span>TVSH e Pagueshme (20%)</span><span style="font-weight:600;color:#dc2626">(${fmtL(tvsh)})</span></div>
       <div class="bil-row" style="border-top:2px solid ${fNeto>0?'#4f6ef7':'#dc2626'};padding-top:8px;margin-top:8px"><span style="font-weight:700;font-size:15px">FITIMI NETO</span><span style="font-weight:800;color:${fNeto>0?'#4f6ef7':'#dc2626'};font-size:18px">${fmtL(fNeto)}</span></div>
     </div>`;
   document.getElementById('bil-body').innerHTML=fitimiBretoHtml+shpenzimetHtml+fitimiNetoHtml;
