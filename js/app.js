@@ -999,3 +999,22 @@ new MutationObserver(() => {
 
 window.addEventListener('resize', initMobile);
 
+// ---- Auto-update: kontrollon çdo 60 sek nëse ka version të ri dhe rifreskon vetë faqen ----
+let _lastKnownAppVersion = null;
+async function _checkAppVersion(){
+  try{
+    const res = await fetch('version.txt?_=' + Date.now(), { cache: 'no-store' });
+    if(!res.ok) return;
+    const v = (await res.text()).trim();
+    if(_lastKnownAppVersion === null){
+      _lastKnownAppVersion = v; // vendos bazën në kontrollin e parë
+      return;
+    }
+    if(v !== _lastKnownAppVersion){
+      location.reload(); // versioni ndryshoi -> rifresko automatikisht
+    }
+  }catch(e){ /* injoro gabimet e rrjetit */ }
+}
+_checkAppVersion();
+setInterval(_checkAppVersion, 60000);
+
