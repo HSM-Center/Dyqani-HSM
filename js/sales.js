@@ -92,7 +92,7 @@ function renderServisCart() {
   el.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr style="background:#f8fafc"><th style="text-align:left;padding:10px">Përshkrimi</th><th style="padding:10px">Sasia</th><th style="text-align:right;padding:10px">Çmimi</th><th style="text-align:right;padding:10px">Totali</th><th></th></tr></thead><tbody>${rows}</tbody></table>`;
   const sub = svCart.reduce((s, c) => s + c.total, 0);
   const tvsh = document.getElementById('sv-tvsh-opt').value === 'po' ? sub * 0.2 : 0;
-  tot.innerHTML = `Total: ${fmtModal(sub + tvsh, curr)}`;
+  tot.innerHTML = `Total: ${fmtModal(sub, curr)}`;
 }
 
 async function addServis() {
@@ -107,10 +107,11 @@ async function addServis() {
   const rate = (curr === 'EUR' && exchangeRateEUR > 0) ? exchangeRateEUR : 1;
   const tsNow = Date.now();
   
-  const subtotal = svCart.reduce((s, c) => s + c.total, 0);
+  const grossTotal = svCart.reduce((s, c) => s + c.total, 0);
   const tvshOpt = document.getElementById('sv-tvsh-opt').value;
-  const tvsh = tvshOpt === 'po' ? subtotal * 0.2 : 0;
-  const totalFat = subtotal + tvsh;
+  const tvsh = tvshOpt === 'po' ? grossTotal * 0.2 : 0;
+  const subtotal = grossTotal - tvsh;
+  const totalFat = grossTotal;
 
   faturatMeta[fat] = { status: 'paguar', paguar: totalFat * rate, borxh: 0, afat: '', kli, data, valuta: curr, tvshOpt };
   
@@ -404,13 +405,14 @@ function renderPrevCart(){
       <td style="text-align:center;padding:8px"><button class="btn btn-danger btn-sm" onclick="prevCart.splice(${i},1);renderPrevCart()" style="font-size:12px;padding:4px 9px">✕</button></td>
     </tr>`).join('')}</tbody>
   </table></div>`;
-  const subtot=prevCart.reduce((s,c)=>s+c.total,0);
+  const grossTotal=prevCart.reduce((s,c)=>s+c.total,0);
   const tvshOpt=document.getElementById('prev-tvsh-opt').value;
-  const tvsh=tvshOpt==='po'?subtot*0.2:0;
+  const tvsh=tvshOpt==='po'?grossTotal*0.2:0;
+  const subtot=grossTotal-tvsh;
   totDiv.innerHTML=`<div style="display:flex;justify-content:flex-end;gap:2rem;align-items:center">
     <span style="font-size:13px;color:#64748b">Nëntotali: <strong style="color:#334155">${fmtL(subtot)}</strong></span>
     <span style="font-size:13px;color:#64748b">TVSH (20%): <strong style="color:#334155">${fmtL(tvsh)}</strong></span>
-    <span style="font-size:20px;font-weight:900;color:#1e293b;background:#e2e8f0;padding:10px 20px;border-radius:10px">TOTAL: ${fmtL(subtot+tvsh)}</span>
+    <span style="font-size:20px;font-weight:900;color:#1e293b;background:#e2e8f0;padding:10px 20px;border-radius:10px">TOTAL: ${fmtL(grossTotal)}</span>
   </div>`;
 }
 
@@ -431,9 +433,10 @@ async function addPreventiv(){
   
   const rate=(curr==='EUR'&&exchangeRateEUR>0)?exchangeRateEUR:1;
   const cartALL=prevCart.map(c=>({...c,cms:c.cms*rate,total:c.sasia*c.cms*rate}));
-  const subtotal=cartALL.reduce((s,c)=>s+c.total,0);
-  const tvsh=tvshOpt==='po'?subtotal*0.2:0;
-  const totalFat=subtotal+tvsh;
+  const grossTotal=cartALL.reduce((s,c)=>s+c.total,0);
+  const tvsh=tvshOpt==='po'?grossTotal*0.2:0;
+  const subtotal=grossTotal-tvsh;
+  const totalFat=grossTotal;
   
   // Regjistrojmë si preventiv (pa prekur stokun)
   faturatMeta[fat]={status:'preventiv',paguar:0,borxh:0,afat:'',kli,data,valuta:curr,tvshOpt};
@@ -447,7 +450,7 @@ async function addPreventiv(){
   
   // Shfaqim faturën për printim
   const items=prevCart.map(c=>({name:c.name,kodi:c.prodId,nje:c.nje,sasia:c.sasia,cm:c.cms,total:c.total}));
-  currentFatureData={tipi:'SHITJEJE',fat,data,pale:kli,pag:'Preventiv',items,subtotal:prevCart.reduce((s,c)=>s+c.total,0),tvsh:tvshOpt==='po'?prevCart.reduce((s,c)=>s+c.total,0)*0.2:0,total:prevCart.reduce((s,c)=>s+c.total,0)*(tvshOpt==='po'?1.2:1),status:'preventiv',paguar:0,borxh:0,afat:'',valuta:curr};
+  currentFatureData={tipi:'SHITJEJE',fat,data,pale:kli,pag:'Preventiv',items,subtotal,tvsh,total:totalFat,status:'preventiv',paguar:0,borxh:0,afat:'',valuta:curr};
   
   closeModalById('modal-preventiv');
   showFatureInline();
@@ -537,10 +540,7 @@ function dsTogglePjeserisht(){
 }
 
 function dsCalcBorxh(){
-  const subtot=dsCart.reduce((s,c)=>s+c.total,0);
-  const tvshOpt=document.getElementById('ds-tvsh-opt').value;
-  const tvsh=tvshOpt==='po'?subtot*0.2:0;
-  const tot=subtot+tvsh;
+  const tot=dsCart.reduce((s,c)=>s+c.total,0);
   const paguar=+document.getElementById('ds-paguar').value||0;
   document.getElementById('ds-borxh').value=Math.max(0,Math.round(tot-paguar));
 }
@@ -680,10 +680,11 @@ function dsRenderCart(){
       <td><button class="btn btn-danger btn-sm" onclick="dsCartRemove(${i})">✕</button></td>
     </tr>`).join('')}
   </tbody></table>`;
-  const subtot=dsCart.reduce((s,c)=>s+c.total,0);
+  const grossTotal=dsCart.reduce((s,c)=>s+c.total,0);
   const tvshOpt=document.getElementById('ds-tvsh-opt').value;
-  const tvsh=tvshOpt==='po'?subtot*0.2:0;
-  const total=subtot+tvsh;
+  const tvsh=tvshOpt==='po'?grossTotal*0.2:0;
+  const subtot=grossTotal-tvsh;
+  const total=grossTotal;
   tot.innerHTML=`Nëntotali: <strong>${fmtModal(subtot, curr)}</strong> &nbsp;|&nbsp; TVSH: <strong>${fmtModal(tvsh, curr)}</strong> &nbsp;|&nbsp; <span style="color:var(--accent);font-size:15px">TOTAL: ${fmtModal(total, curr)}</span>`;
 }
 
@@ -713,10 +714,11 @@ async function dsAddShitje() {
         total: Math.round(c.sasia * c.cms * rate * 100) / 100
     }));
     
-    const subtotal = cartALL.reduce((s, c) => s + c.total, 0);
+    const grossTotal = cartALL.reduce((s, c) => s + c.total, 0);
     const tvshOpt = document.getElementById('ds-tvsh-opt').value;
-    const tvsh = (tvshOpt === 'po') ? subtotal * 0.2 : 0;
-    const totalFat = subtotal + tvsh;
+    const tvsh = (tvshOpt === 'po') ? grossTotal * 0.2 : 0;
+    const subtotal = grossTotal - tvsh;
+    const totalFat = grossTotal;
     
     let status = 'paguar';
     let paguar = totalFat;
@@ -782,8 +784,9 @@ async function dsAddShitje() {
         cm: c.cms,
         total: c.total
     }));
-    const subSnap = items.reduce((s, i) => s + i.total, 0);
-    const tvshSnap = (tvshOpt === 'po') ? subSnap * 0.2 : 0;
+    const grossSnap = items.reduce((s, i) => s + i.total, 0);
+    const tvshSnap = (tvshOpt === 'po') ? grossSnap * 0.2 : 0;
+    const subSnap = grossSnap - tvshSnap;
     currentFatureData = {
         tipi: 'SHITJEJE',
         fat: fat,
@@ -793,7 +796,7 @@ async function dsAddShitje() {
         items: items,
         subtotal: subSnap,
         tvsh: tvshSnap,
-        total: subSnap + tvshSnap,
+        total: grossSnap,
         status: status,
         paguar: paguar / rate,
         borxh: borxh / rate,
@@ -821,10 +824,7 @@ function togglePjesërisht(){
 }
 
 function calcBorxh(){
-  const subtot=cart.reduce((s,c)=>s+c.total,0);
-  const tvshOpt=document.getElementById('s-tvsh-opt').value;
-  const tvsh=tvshOpt==='po'?subtot*0.2:0;
-  const tot=subtot+tvsh;
+  const tot=cart.reduce((s,c)=>s+c.total,0);
   const paguar=+document.getElementById('s-paguar').value||0;
   document.getElementById('s-borxh').value=Math.max(0,Math.round(tot-paguar));
 }
@@ -919,10 +919,11 @@ function renderCart(){
       <td><button class="btn btn-danger btn-sm" onclick="cartRemove(${i})">✕</button></td>
     </tr>`).join('')}
   </tbody></table>`;
-  const subtot=cart.reduce((s,c)=>s+c.total,0);
+  const grossTotal=cart.reduce((s,c)=>s+c.total,0);
   const tvshOpt = document.getElementById('s-tvsh-opt').value;
-  const tvsh = tvshOpt === 'po' ? subtot * 0.2 : 0;
-  const total = subtot + tvsh;
+  const tvsh = tvshOpt === 'po' ? grossTotal * 0.2 : 0;
+  const subtot = grossTotal - tvsh;
+  const total = grossTotal;
   tot.innerHTML=`Nëntotali: <strong>${fmtModal(subtot, curr)}</strong> &nbsp;|&nbsp; TVSH: <strong>${fmtModal(tvsh, curr)}</strong> &nbsp;|&nbsp; <span style="color:var(--accent);font-size:15px">TOTAL: ${fmtModal(total, curr)}</span>`;
 }
 
@@ -950,10 +951,11 @@ async function addShitje() {
         cms: Math.round(c.cms * rate * 100) / 100,
         total: Math.round(c.sasia * c.cms * rate * 100) / 100
     }));
-    const subtotal = cartALL.reduce((s, c) => s + c.total, 0);
+    const grossTotal = cartALL.reduce((s, c) => s + c.total, 0);
     const tvshOpt = document.getElementById('s-tvsh-opt').value;
-    const tvsh = (tvshOpt === 'po') ? subtotal * 0.2 : 0;
-    const totalFat = subtotal + tvsh;
+    const tvsh = (tvshOpt === 'po') ? grossTotal * 0.2 : 0;
+    const subtotal = grossTotal - tvsh;
+    const totalFat = grossTotal;
     const cartSnapshot = cart.map(c => ({ ...c }));
     
     let status = 'paguar';
@@ -1021,8 +1023,9 @@ async function addShitje() {
         cm: c.cms,
         total: c.total
     }));
-    const subSnap = items.reduce((s, i) => s + i.total, 0);
-    const tvshSnap = (tvshOpt === 'po') ? subSnap * 0.2 : 0;
+    const grossSnap = items.reduce((s, i) => s + i.total, 0);
+    const tvshSnap = (tvshOpt === 'po') ? grossSnap * 0.2 : 0;
+    const subSnap = grossSnap - tvshSnap;
     currentFatureData = {
         tipi: 'SHITJEJE',
         fat: fat,
@@ -1032,7 +1035,7 @@ async function addShitje() {
         items: items,
         subtotal: subSnap,
         tvsh: tvshSnap,
-        total: subSnap + tvshSnap,
+        total: grossSnap,
         status: status,
         paguar: paguar / rate,
         borxh: borxh / rate,
@@ -1126,7 +1129,7 @@ function renderShitjet(){
       const meta=getFatureMeta(f.fat);
       const status=meta.status||'paguar';
       const tvsh=meta.tvshOpt==='po'?f.tot*0.2:0;
-      const total=f.tot+tvsh;
+      const total=f.tot;
       const statusColors={paguar:['#f0fdf4','#16a34a','✓ Paguar'],papaguar:['#fef2f2','#dc2626','✗ Pa Paguar'],pjeserisht:['#f5f3ff','#7c3aed','◑ Pjesërisht'],preventiv:['#f5f3ff','#7c3aed','📝 Preventiv']};
       const sc=statusColors[status]||statusColors.paguar;
       const pagColors={Cash:['#fefce8','#ca8a04'],Servis:['#fef9c3','#ca8a04'],Debitor:['#fef2f2','#dc2626'],Pjesërisht:['#f5f3ff','#7c3aed'],Preventiv:['#f5f3ff','#7c3aed']};
@@ -1168,7 +1171,8 @@ function renderShitjet(){
     const status=meta.status||'paguar';
     const pagBadge=f.pag==='Cash'?badge('Cash','#fefce8','#ca8a04'):f.pag==='Servis'?badge('Servis','#fef9c3','#a16207'):f.pag==='Debitor'?badge('Debitor','#fef2f2','#dc2626'):f.pag==='Preventiv'?badge('Preventiv','#f5f3ff','#7c3aed'):badge('Pjesërisht','#f5f3ff','#7c3aed');
     const tvsh = meta.tvshOpt === 'po' ? f.tot * 0.2 : 0;
-    const total = f.tot + tvsh;
+    const netTot = f.tot - tvsh;
+    const total = f.tot;
     const thisM=(f.data||'').slice(0,7);
     let sep='';
     if(thisM&&thisM!==lastM){
@@ -1180,7 +1184,7 @@ function renderShitjet(){
       <td style="font-weight:700;color:var(--text)">${f.kli}</td>
       <td>${f.data}</td>
       <td style="color:var(--text3)">${f.items.length} artikuj</td>
-      <td>${fmtL(f.tot)}</td>
+      <td>${fmtL(netTot)}</td>
       <td style="color:var(--text3)">${fmtL(tvsh)}</td>
       <td style="color:#22c55e;font-weight:700">${fmtL(total)}</td>
       <td>${pagBadge}</td>
@@ -1204,7 +1208,7 @@ function paguajPreventiv(fat){
   const dataFat = (shitjet.find(s=>s.fat===fat)||{}).data || today();
   const totFat = shitjet.filter(s=>s&&s.fat===fat).reduce((s,x)=>s+(x.sasia||0)*(x.cms||0),0);
   const kaTVSH = meta.tvshOpt==='po';
-  const totalFat = kaTVSH ? totFat*1.2 : totFat;
+  const totalFat = totFat;
 
   const existing = document.getElementById('dlg-prev-pay');
   if(existing) existing.remove();
@@ -1323,7 +1327,7 @@ function markPaguar(fat) {
   const meta = faturatMeta[fat] || {};
   const totFat = shitjet.filter(s=>s&&s.fat===fat).reduce((s,x)=>s+(x.sasia||0)*(x.cms||0),0);
   const kaTVSH = meta.tvshOpt==='po';
-  const totalFat = kaTVSH ? totFat*1.2 : totFat;
+  const totalFat = totFat;
   const borxhAktual = (Number(meta.borxh) > 0) ? Number(meta.borxh) : Math.max(0, totalFat - Number(meta.paguar || 0));
   const klienti = (shitjet.find(s=>s.fat===fat)||{}).kli || fat;
   const dataFat = (shitjet.find(s=>s.fat===fat)||{}).data || '';
@@ -1564,7 +1568,8 @@ function renderFaturat(){
     const meta=getFatureMeta(f.fat);
     const status=f.tipi==='Shitje'?getFatureStatus(f.fat):'paguar';
     const tvsh=meta.tvshOpt==='po'?f.vlera*0.2:0;
-    const total=f.vlera+tvsh;
+    const netVlera=f.vlera-tvsh;
+    const total=f.vlera;
     const thisMuaj=(f.data||'').slice(0,7);
     let separator='';
     if(thisMuaj && thisMuaj!==lastMuaj){
@@ -1583,7 +1588,7 @@ function renderFaturat(){
       <td style="padding:12px 14px;color:var(--text2);font-size:12px;white-space:nowrap">${f.data}</td>
       <td style="padding:12px 14px">${tipiBadge}</td>
       <td style="padding:12px 14px;font-weight:700;color:var(--text);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${f.pale}</td>
-      <td style="padding:12px 14px;text-align:right;color:var(--text2)">${fmtL(f.vlera)}</td>
+      <td style="padding:12px 14px;text-align:right;color:var(--text2)">${fmtL(netVlera)}</td>
       <td style="padding:12px 14px;text-align:right;color:var(--text3);font-size:12px">${tvsh>0?fmtL(tvsh):'—'}</td>
       <td style="padding:12px 14px;text-align:right;font-weight:800;color:${isBlerje?'#4f6ef7':'#22c55e'};font-size:14px">${fmtL(total)}</td>
       <td style="padding:12px 14px">${statusHtml}</td>
@@ -1680,7 +1685,7 @@ function renderDebitoret(){
     }
     body.innerHTML = filtered.map(([fat, m]) => {
       try {
-        const totFat = shitjet.filter(s => s && s.fat === fat).reduce((s,x) => s+(x.sasia||0)*(x.cms||0),0) * 1.2;
+        const totFat = shitjet.filter(s => s && s.fat === fat).reduce((s,x) => s+(x.sasia||0)*(x.cms||0),0);
         const borxh = m.borxh || 0;
         const paguar = m.paguar || 0;
         const pct = totFat > 0 ? Math.min(100, Math.round(paguar/totFat*100)) : 0;
@@ -1742,7 +1747,7 @@ function renderDebitoret(){
 
   body.innerHTML = filtered.map(([fat, m]) => {
     try {
-      const totFat = shitjet.filter(s => s && s.fat === fat).reduce((s,x) => s+(x.sasia||0)*(x.cms||0),0) * 1.2;
+      const totFat = shitjet.filter(s => s && s.fat === fat).reduce((s,x) => s+(x.sasia||0)*(x.cms||0),0);
       const borxh = m.borxh || 0;
       const paguar = m.paguar || 0;
       const pct = totFat > 0 ? Math.min(100, Math.round(paguar/totFat*100)) : 0;
