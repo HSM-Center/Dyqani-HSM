@@ -38,9 +38,11 @@
   cursor: pointer;
   z-index: 5;
 }
-@media (max-width: 900px){
+@media (max-width: 900px) and (min-width: 769px){
   /* Kur sidebar-i shndërrohet në shirit horizontal, mos e lër topbar-in
-     ta mbulojë butonin: sigurojmë z-index dhe hapësirë të mjaftueshme. */
+     ta mbulojë butonin: sigurojmë z-index dhe hapësirë të mjaftueshme.
+     E kufizuar vetëm te ky interval (769–900px) që të mos prishë
+     scroll-in e brendshëm të sirtarit (drawer) në celular (≤768px). */
   #sidebar{ overflow: visible !important; }
   #sidebar .logo{ display:flex !important; align-items:center !important; gap:8px; }
 }
