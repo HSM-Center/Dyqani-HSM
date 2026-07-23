@@ -921,6 +921,26 @@ function toggleMobileSidebar() {
   const open = sb.classList.toggle('mobile-open');
   ov.classList.toggle('show', open);
   if (btn) btn.innerHTML = open ? '✕' : '☰';
+  if (open) {
+    document.body.dataset.scrollY = String(window.scrollY || window.pageYOffset || 0);
+    document.body.style.position = 'fixed';
+    document.body.style.top = '-' + document.body.dataset.scrollY + 'px';
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.width = '100%';
+  } else {
+    restoreBodyScroll();
+  }
+}
+
+function restoreBodyScroll() {
+  const y = parseInt(document.body.dataset.scrollY || '0', 10);
+  document.body.style.position = '';
+  document.body.style.top = '';
+  document.body.style.left = '';
+  document.body.style.right = '';
+  document.body.style.width = '';
+  window.scrollTo(0, y);
 }
 
 function closeMobileSidebar() {
@@ -930,6 +950,7 @@ function closeMobileSidebar() {
   if (sb)  sb.classList.remove('mobile-open');
   if (ov)  ov.classList.remove('show');
   if (btn) btn.innerHTML = '☰';
+  restoreBodyScroll();
 }
 
 function handleMobNav(el, tab, action) {
