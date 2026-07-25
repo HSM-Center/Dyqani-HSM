@@ -17,7 +17,7 @@ function llogaritXhiroSotme() {
   const faturaSot = {};
   
   shitjet.forEach(s => {
-    if (s.pag === 'Preventiv' || s.data !== sot) return;
+    if (s.pag === 'Preventiv') return;
     
     const ts = s.ts != null ? Number(s.ts) : 0;
     if (ts <= xhiroTsFundit) return;
@@ -47,7 +47,7 @@ function llogaritXhiroSotme() {
 
   // Shto arkëtimet e debitorëve të bëra sot (pas xhiros së fundit)
   arketimet.forEach(a => {
-    if (a.data === sot && a.ts > xhiroTsFundit) {
+    if (a.ts > xhiroTsFundit) {
       arkCash += a.shuma;
     }
   });
@@ -66,22 +66,27 @@ function mbylleXhiron() {
     return;
   }
 
-  const arkSot = arketimet.filter(a => a.data === sot && a.ts > xhiroTsFundit);
+  const arkSot = arketimet.filter(a => a.ts > xhiroTsFundit);
   const totArk = arkSot.reduce((s,a)=>s+a.shuma,0);
 
-  if (!confirm(`⚠ Jeni duke mbyllur xhiron e sotme (${sot}).\n💵 Cash shitje: ${fmtL(_xh.cash)} | Arkëtime debitorësh: ${fmtL(_xh.arkCash)} | 🔴 Debitor i ri: ${fmtL(_xh.debitor)}\n✅ Total Cash i arkëtuar: ${fmtL(_xh.cash + _xh.arkCash)}\nVazhdoni?`)) {
+  const periudhaLabel = xhiroTsFundit > 0
+    ? `nga ${new Date(xhiroTsFundit).toLocaleDateString('sq-AL')} deri ${sot}`
+    : `deri ${sot}`;
+
+  if (!confirm(`⚠ Jeni duke mbyllur xhiron (${periudhaLabel}).\n💵 Cash shitje: ${fmtL(_xh.cash)} | Arkëtime debitorësh: ${fmtL(_xh.arkCash)} | 🔴 Debitor i ri: ${fmtL(_xh.debitor)}\n✅ Total Cash i arkëtuar: ${fmtL(_xh.cash + _xh.arkCash)}\nVazhdoni?`)) {
     return;
   }
 
   const mbyllja = {
     data: sot,
+    periudha: periudhaLabel,
     ts: Date.now(),
     totali: _xh.cash + _xh.arkCash,
     cash: _xh.cash,
     arkCash: _xh.arkCash,
     debitor: _xh.debitor,
-    numriFaturave: [...new Set(shitjet.filter(s => s.data === sot && s.pag !== 'Preventiv' && (s.ts != null ? Number(s.ts) : 0) > xhiroTsFundit).map(s => s.fat))].length,
-    detajet: shitjet.filter(s => s.data === sot && s.pag !== 'Preventiv' && (s.ts != null ? Number(s.ts) : 0) > xhiroTsFundit).map(s => {
+    numriFaturave: [...new Set(shitjet.filter(s => s.pag !== 'Preventiv' && (s.ts != null ? Number(s.ts) : 0) > xhiroTsFundit).map(s => s.fat))].length,
+    detajet: shitjet.filter(s => s.pag !== 'Preventiv' && (s.ts != null ? Number(s.ts) : 0) > xhiroTsFundit).map(s => {
       const meta = faturatMeta[s.fat] || {};
       const vlera = s.sasia * s.cms;
       const totalMeTVSH = meta.tvshOpt === 'po' ? vlera * 1.2 : vlera;
@@ -107,7 +112,7 @@ function mbylleXhiron() {
   save();
 
   renderXhiro();
-  alert(`✅ Xhiro e ditës ${sot} u mbyll me sukses!\nCash shitje: ${fmtL(_xh.cash)}\nArkëtime debitorësh: ${fmtL(_xh.arkCash)}\n🔴 Debitor i ri: ${fmtL(_xh.debitor)}\n✅ Total Cash: ${fmtL(_xh.cash + _xh.arkCash)}\nXhiro e re fillon nga 0.`);
+  alert(`✅ Xhiro (${periudhaLabel}) u mbyll me sukses!\nCash shitje: ${fmtL(_xh.cash)}\nArkëtime debitorësh: ${fmtL(_xh.arkCash)}\n🔴 Debitor i ri: ${fmtL(_xh.debitor)}\n✅ Total Cash: ${fmtL(_xh.cash + _xh.arkCash)}\nXhiro e re fillon nga 0.`);
 }
 
 function shikoDetajetXhiro(index) {
@@ -269,11 +274,12 @@ function renderXhiro() {
   if(arkEl && totalSot.arkCash > 0) arkEl.textContent = `💵 Nga të cilat arkëtime debitorësh: ${fmtL(totalSot.arkCash)}`;
   if (xhiroTsFundit > 0) {
     const mbylljaHere = new Date(xhiroTsFundit);
+    const dataMbylljes = mbylljaHere.toLocaleDateString('sq-AL');
     const h = String(mbylljaHere.getHours()).padStart(2,'0');
     const m = String(mbylljaHere.getMinutes()).padStart(2,'0');
-    document.getElementById('xhiro-date-sot').textContent = `(nga ora ${h}:${m} — pas mbylljes)`;
+    document.getElementById('xhiro-date-sot').textContent = `(nga ${dataMbylljes} ${h}:${m} deri ${sot})`;
   } else {
-    document.getElementById('xhiro-date-sot').textContent = `(${sot})`;
+    document.getElementById('xhiro-date-sot').textContent = `(që nga fillimi deri ${sot})`;
   }
 
   const historikuSorted = [...xhiroHistoriku].reverse();
