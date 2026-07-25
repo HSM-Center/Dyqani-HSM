@@ -59,9 +59,9 @@ function llogaritXhiroSotme() {
 function mbylleXhiron() {
   const sot = today();
   const _xh = llogaritXhiroSotme();
-  const totali = _xh.total;
+  const totaliLlogaritur = _xh.total;
   
-  if (totali === 0) {
+  if (totaliLlogaritur === 0 && _xh.debitor === 0) {
     alert('ℹ Xhiro e sotme është 0 Lek. Nuk ka asgjë për të mbyllur.');
     return;
   }
@@ -73,7 +73,19 @@ function mbylleXhiron() {
     ? `nga ${new Date(xhiroTsFundit).toLocaleDateString('sq-AL')} deri ${sot}`
     : `deri ${sot}`;
 
-  if (!confirm(`⚠ Jeni duke mbyllur xhiron (${periudhaLabel}).\n💵 Cash shitje: ${fmtL(_xh.cash)} | Arkëtime debitorësh: ${fmtL(_xh.arkCash)} | 🔴 Debitor i ri: ${fmtL(_xh.debitor)}\n✅ Total Cash i arkëtuar: ${fmtL(_xh.cash + _xh.arkCash)}\nVazhdoni?`)) {
+  const inputStr = prompt(`💵 Xhiro e llogaritur automatikisht: ${fmtL(totaliLlogaritur)}\n\nFut shumën reale të Cash-it që po mbyllet (mund ta ndryshosh nëse arka fizike ndryshon):`, totaliLlogaritur);
+
+  if (inputStr === null) return; // anuloi
+
+  const totaliReal = parseFloat(String(inputStr).replace(/[^\d.,-]/g, '').replace(',', '.'));
+  if (isNaN(totaliReal) || totaliReal < 0) {
+    alert('⚠ Shuma e futur nuk është e vlefshme.');
+    return;
+  }
+
+  const diferenca = totaliReal - totaliLlogaritur;
+
+  if (!confirm(`⚠ Jeni duke mbyllur xhiron (${periudhaLabel}).\n💵 Xhiro e llogaritur: ${fmtL(totaliLlogaritur)}\n✏️ Xhiro që po mbyllet: ${fmtL(totaliReal)}${diferenca !== 0 ? `\n⚖️ Diferenca: ${diferenca > 0 ? '+' : ''}${fmtL(diferenca)}` : ''}\n🔴 Debitor i ri: ${fmtL(_xh.debitor)}\nVazhdoni?`)) {
     return;
   }
 
@@ -81,7 +93,9 @@ function mbylleXhiron() {
     data: sot,
     periudha: periudhaLabel,
     ts: Date.now(),
-    totali: _xh.cash + _xh.arkCash,
+    totali: totaliReal,
+    totaliLlogaritur: totaliLlogaritur,
+    diferenca: diferenca,
     cash: _xh.cash,
     arkCash: _xh.arkCash,
     debitor: _xh.debitor,
@@ -112,7 +126,7 @@ function mbylleXhiron() {
   save();
 
   renderXhiro();
-  alert(`✅ Xhiro (${periudhaLabel}) u mbyll me sukses!\nCash shitje: ${fmtL(_xh.cash)}\nArkëtime debitorësh: ${fmtL(_xh.arkCash)}\n🔴 Debitor i ri: ${fmtL(_xh.debitor)}\n✅ Total Cash: ${fmtL(_xh.cash + _xh.arkCash)}\nXhiro e re fillon nga 0.`);
+  alert(`✅ Xhiro (${periudhaLabel}) u mbyll me sukses!\n💵 Xhiro e mbyllur: ${fmtL(totaliReal)}${diferenca !== 0 ? `\n⚖️ Diferenca nga llogaritja: ${diferenca > 0 ? '+' : ''}${fmtL(diferenca)}` : ''}\n🔴 Debitor i ri: ${fmtL(_xh.debitor)}\nXhiro e re fillon nga 0.`);
 }
 
 function shikoDetajetXhiro(index) {
@@ -301,12 +315,15 @@ function renderXhiro() {
       const mm=String(d.getMinutes()).padStart(2,'0');
       oraStr=` <span style="font-size:11px;color:var(--text3);font-weight:500">🕐 ${hh}:${mm}</span>`;
     }
-    const cashReal = (m.cash||0) + (m.arkCash||0);
+    const cashReal = m.totali != null ? m.totali : ((m.cash||0) + (m.arkCash||0));
     const debReal  = m.debitor||0;
+    const difBadge = (m.diferenca && m.diferenca !== 0)
+      ? ` <span style="font-size:10px;color:${m.diferenca>0?'#16a34a':'#dc2626'};font-weight:600">(${m.diferenca>0?'+':''}${fmtL(m.diferenca)})</span>`
+      : '';
     return `
       <tr>
         <td style="font-weight:600;">${m.data}${oraStr}</td>
-        <td style="font-weight:700;color:${cashReal>0?'#16a34a':'var(--text3)'};">${fmtL(cashReal)}</td>
+        <td style="font-weight:700;color:${cashReal>0?'#16a34a':'var(--text3)'};">${fmtL(cashReal)}${difBadge}</td>
         <td style="font-weight:700;color:${debReal>0?'#dc2626':'var(--text3)'};">${debReal>0?fmtL(debReal):'—'}</td>
         <td>${m.numriFaturave || 0}</td>
         <td style="display:flex;gap:4px">
