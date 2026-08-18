@@ -6,6 +6,8 @@ function openShitjeModal(){
   document.getElementById('s-prod-dropdown').style.display='none';
   document.getElementById('s-cms').value='';
   document.getElementById('s-sasia').value='1';
+  const sGarValInit=document.getElementById('s-gar-val'); if(sGarValInit) sGarValInit.value='';
+  const sGarNjeInit=document.getElementById('s-gar-nje'); if(sGarNjeInit) sGarNjeInit.value='muaj';
   sCurrentPriceType='1';
   document.querySelectorAll('.ptype-btn').forEach(b=>b.classList.toggle('active', b.dataset.type==='1'));
   const njeEl=document.getElementById('s-nje');if(njeEl)njeEl.value='Cope';
@@ -223,6 +225,10 @@ function selectProd(id){
     document.getElementById('s-cms').value = price.toFixed(2);
   }
   document.getElementById('s-prod-dropdown').style.display='none';
+  const sGarVal=document.getElementById('s-gar-val');
+  const sGarNje=document.getElementById('s-gar-nje');
+  if(sGarVal) sGarVal.value = (p.garancia && p.garancia.val) || '';
+  if(sGarNje) sGarNje.value = (p.garancia && p.garancia.nje) || 'muaj';
   const njeSelect=document.getElementById('s-nje');
   if(njeSelect){
     const opts=[...njeSelect.options].map(o=>o.value);
@@ -598,6 +604,10 @@ function dsSelectProd(id){
     document.getElementById('ds-cms').value=price.toFixed(2);
   }
   document.getElementById('ds-prod-dropdown').style.display='none';
+  const dsGarVal=document.getElementById('ds-gar-val');
+  const dsGarNje=document.getElementById('ds-gar-nje');
+  if(dsGarVal) dsGarVal.value = (p.garancia && p.garancia.val) || '';
+  if(dsGarNje) dsGarNje.value = (p.garancia && p.garancia.nje) || 'muaj';
   const njeSelect=document.getElementById('ds-nje');
   if(njeSelect && p.nje){
     const opt=[...njeSelect.options].find(o=>o.value===p.nje||o.textContent===p.nje);
@@ -647,14 +657,19 @@ function dsCartAdd(){
   if(!p){alert('Produkti nuk u gjet!');return;}
   const avail=p.stok - dsCart.filter(c=>c.prodId===prodId).reduce((s,c)=>s+c.sasia,0);
   if(sasia>avail){alert('Stoku i pamjaftueshëm! Disponibël: '+avail+' '+p.nje);return;}
-  const ex=dsCart.findIndex(c=>c.prodId===prodId&&c.cms===cms&&c.nje===nje);
+  const gVal = +(document.getElementById('ds-gar-val')?.value) || 0;
+  const gNje = document.getElementById('ds-gar-nje')?.value || 'muaj';
+  const garancia = gVal > 0 ? {val: gVal, nje: gNje} : null;
+  const ex=dsCart.findIndex(c=>c.prodId===prodId&&c.cms===cms&&c.nje===nje&&JSON.stringify(c.garancia)===JSON.stringify(garancia));
   if(ex>=0){dsCart[ex].sasia+=sasia;dsCart[ex].total=Math.round(dsCart[ex].sasia*dsCart[ex].cms*100)/100;}
-  else dsCart.push({prodId,name:p.name,nje,sasia,cms,total:Math.round(sasia*cms*100)/100});
+  else dsCart.push({prodId,name:p.name,nje,sasia,cms,total:Math.round(sasia*cms*100)/100,garancia});
   document.getElementById('ds-sasia').value='1';
   document.getElementById('ds-cms').value='';
   document.getElementById('ds-prod').value='';
   document.getElementById('ds-prod-search').value='';
   document.getElementById('ds-prod-dropdown').style.display='none';
+  const dsGarValEl=document.getElementById('ds-gar-val'); if(dsGarValEl) dsGarValEl.value='';
+  const dsGarNjeEl=document.getElementById('ds-gar-nje'); if(dsGarNjeEl) dsGarNjeEl.value='muaj';
   dsRenderCart();
   const srch = document.getElementById('ds-prod-search');
   if(srch) srch.focus();
@@ -671,11 +686,12 @@ function dsRenderCart(){
     tot.innerHTML='';
     return;
   }
-  el.innerHTML=`<table style="font-size:13px"><thead><tr>${['Produkti','Sasia','Çmimi','Totali',''].map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>
+  el.innerHTML=`<table style="font-size:13px"><thead><tr>${['Produkti','Sasia','Çmimi','Garancia','Totali',''].map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>
     ${dsCart.map((c,i)=>`<tr>
       <td style="font-weight:600;color:var(--text)">${c.name}<br><span class="mono">${c.prodId}</span></td>
       <td style="text-align:center">${c.sasia} ${c.nje}</td>
       <td style="text-align:right">${fmtModal(c.cms, curr)}</td>
+      <td style="text-align:center;color:var(--text3)">${(c.garancia && garanciaLabel(c))||'—'}</td>
       <td style="text-align:right;font-weight:700;color:var(--accent)">${fmtModal(c.total, curr)}</td>
       <td><button class="btn btn-danger btn-sm" onclick="dsCartRemove(${i})">✕</button></td>
     </tr>`).join('')}
@@ -753,6 +769,7 @@ async function dsAddShitje() {
             prod: c.prodId,
             sasia: c.sasia,
             cms: c.cms,
+            garancia: c.garancia || null,
             pag: pag,
             ts: tsNow
         });
@@ -886,14 +903,19 @@ function cartAdd(){
   if(!p){alert('Produkti nuk u gjet!');return;}
   const avail=p.stok - cart.filter(c=>c.prodId===prodId).reduce((s,c)=>s+c.sasia,0);
   if(sasia>avail){alert('Stoku i pamjaftueshëm! Disponibël: '+avail+' '+p.nje);return;}
-  const ex=cart.findIndex(c=>c.prodId===prodId&&c.cms===cms&&c.nje===nje);
+  const gVal = +(document.getElementById('s-gar-val')?.value) || 0;
+  const gNje = document.getElementById('s-gar-nje')?.value || 'muaj';
+  const garancia = gVal > 0 ? {val: gVal, nje: gNje} : null;
+  const ex=cart.findIndex(c=>c.prodId===prodId&&c.cms===cms&&c.nje===nje&&JSON.stringify(c.garancia)===JSON.stringify(garancia));
   if(ex>=0){cart[ex].sasia+=sasia;cart[ex].total=Math.round(cart[ex].sasia*cart[ex].cms*100)/100;}
-  else cart.push({prodId,name:p.name,nje,sasia,cms,total:Math.round(sasia*cms*100)/100});
+  else cart.push({prodId,name:p.name,nje,sasia,cms,total:Math.round(sasia*cms*100)/100,garancia});
   document.getElementById('s-sasia').value='1';
   document.getElementById('s-cms').value='';
   document.getElementById('s-prod').value='';
   document.getElementById('s-prod-search').value='';
   document.getElementById('s-prod-dropdown').style.display='none';
+  const sGarValEl=document.getElementById('s-gar-val'); if(sGarValEl) sGarValEl.value='';
+  const sGarNjeEl=document.getElementById('s-gar-nje'); if(sGarNjeEl) sGarNjeEl.value='muaj';
   renderCart();
   const srch2 = document.getElementById('s-prod-search');
   if(srch2) srch2.focus();
@@ -910,11 +932,12 @@ function renderCart(){
     tot.innerHTML='';
     return;
   }
-  el.innerHTML=`<table style="font-size:13px"><thead><tr>${['Produkti','Sasia','Çmimi','Totali',''].map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>
+  el.innerHTML=`<table style="font-size:13px"><thead><tr>${['Produkti','Sasia','Çmimi','Garancia','Totali',''].map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>
     ${cart.map((c,i)=>`<tr>
       <td style="font-weight:600;color:var(--text)">${c.name}<br><span class="mono">${c.prodId}</span></td>
       <td style="text-align:center">${c.sasia} ${c.nje}</td>
       <td style="text-align:right">${fmtModal(c.cms, curr)}</td>
+      <td style="text-align:center;color:var(--text3)">${(c.garancia && garanciaLabel(c))||'—'}</td>
       <td style="text-align:right;font-weight:700;color:var(--accent)">${fmtModal(c.total, curr)}</td>
       <td><button class="btn btn-danger btn-sm" onclick="cartRemove(${i})">✕</button></td>
     </tr>`).join('')}
@@ -991,6 +1014,7 @@ async function addShitje() {
             prod: c.prodId,
             sasia: c.sasia,
             cms: c.cms,
+            garancia: c.garancia || null,
             pag: pag,
             ts: tsNow
         });
