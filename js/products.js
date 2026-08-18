@@ -1,3 +1,10 @@
+function garanciaLabel(p){
+  const g = p && p.garancia;
+  if(!g || !g.val) return '';
+  if(g.nje === 'vite') return g.val + ' ' + (g.val === 1 ? 'vit' : 'vite');
+  return g.val + ' muaj';
+}
+
 function prodSearchInputBlerje(q){
   const dd=document.getElementById('b-prod-dropdown');
   const trimmed=q.trim().toLowerCase();
@@ -116,10 +123,14 @@ function addProduct(){
   const stok=+document.getElementById('p-stok').value;
   if(!id||!name||!cmb||!cms){alert('Plotëso fushat e detyrueshme!');return;}
   if(products.find(p=>String(p.id)===String(id))){alert('Kodi ekziston tashmë!');return;}
-  products.push({id,name,kat:document.getElementById('p-kat').value||'Tjetër',nje:document.getElementById('p-nje').value,cmb,cms,cms2,stok,min:+document.getElementById('p-min').value||1,foto:document.getElementById('p-foto').value||''});
+  const gVal = +(document.getElementById('p-gar-val')?.value) || 0;
+  const gNje = document.getElementById('p-gar-nje')?.value || 'muaj';
+  const garancia = gVal > 0 ? {val: gVal, nje: gNje} : null;
+  products.push({id,name,kat:document.getElementById('p-kat').value||'Tjetër',nje:document.getElementById('p-nje').value,cmb,cms,cms2,stok,min:+document.getElementById('p-min').value||1,foto:document.getElementById('p-foto').value||'',garancia});
   save();closeModalById('modal-addprod');renderAll();
-  ['p-id','p-name','p-kat','p-cmb','p-cms','p-cms2','p-stok','p-foto'].forEach(x=>document.getElementById(x).value='');
+  ['p-id','p-name','p-kat','p-cmb','p-cms','p-cms2','p-stok','p-foto','p-gar-val'].forEach(x=>{const el=document.getElementById(x);if(el)el.value='';});
   document.getElementById('p-min').value='1';
+  const gNjeEl=document.getElementById('p-gar-nje'); if(gNjeEl) gNjeEl.value='muaj';
 }
 function openQuickStok(id){
   const p = getProd(id);
@@ -178,6 +189,10 @@ function openEditProdModal(id){
   document.getElementById('ep-stok').value=p.stok;
   document.getElementById('ep-min').value=p.min;
   document.getElementById('ep-foto').value=p.foto||'';
+  const epGarVal=document.getElementById('ep-gar-val');
+  const epGarNje=document.getElementById('ep-gar-nje');
+  if(epGarVal) epGarVal.value = (p.garancia && p.garancia.val) || '';
+  if(epGarNje) epGarNje.value = (p.garancia && p.garancia.nje) || 'muaj';
   document.getElementById('modal-editprod').classList.add('open');
 }
 async function saveEditProd(){
@@ -212,6 +227,9 @@ async function saveEditProd(){
   p.stok=+document.getElementById('ep-stok').value||0;
   p.min=+document.getElementById('ep-min').value||1;
   p.foto=document.getElementById('ep-foto').value||'';
+  const epGarVal = +(document.getElementById('ep-gar-val')?.value) || 0;
+  const epGarNje = document.getElementById('ep-gar-nje')?.value || 'muaj';
+  p.garancia = epGarVal > 0 ? {val: epGarVal, nje: epGarNje} : null;
   save();closeModalById('modal-editprod');renderAll();
 }
 async function deleteProduct(id){if(!confirm('Fshi produktin '+id+'?'))return;products=products.filter(p=>String(p.id)!==String(id));try{await sb.from('products').delete().eq('id',id);}catch(e){console.warn('⚠ Supabase delete error:',e);}save();renderAll();}
@@ -620,8 +638,8 @@ function renderMagazine(){
     p.name.toLowerCase().includes(magQ) || p.id.toLowerCase().includes(magQ) || (p.kat||'').toLowerCase().includes(magQ)
   ) : products;
 
-  document.getElementById('mag-head').innerHTML='<tr>'+['Kodi','Emri','Njësia','Stoku','Min.','Vlera Stoku','Statusi',''].map(h=>`<th>${h}</th>`).join('')+'</tr>';
-  document.getElementById('mag-body').innerHTML=filteredProds.length===0?`<tr><td colspan="8" style="text-align:center;color:var(--text3);padding:2rem">Nuk u gjet asnjë produkt</td></tr>`:filteredProds.map(p=>{
+  document.getElementById('mag-head').innerHTML='<tr>'+['Kodi','Emri','Njësia','Stoku','Min.','Vlera Stoku','Garancia','Statusi',''].map(h=>`<th>${h}</th>`).join('')+'</tr>';
+  document.getElementById('mag-body').innerHTML=filteredProds.length===0?`<tr><td colspan="9" style="text-align:center;color:var(--text3);padding:2rem">Nuk u gjet asnjë produkt</td></tr>`:filteredProds.map(p=>{
     const low=p.stok<=p.min;
     return `<tr>
       <td class="mono">${p.id}</td>
@@ -630,6 +648,7 @@ function renderMagazine(){
       <td style="color:${low?'#dc2626':'#16a34a'};font-weight:700">${p.stok}</td>
       <td>${p.min}</td>
       <td style="font-weight:600">${fmtL(p.stok*p.cmb)}</td>
+      <td style="color:var(--text3)">${garanciaLabel(p)||'—'}</td>
       <td>${badge(low?'⚠ I Ulët':'✓ Normal',low?'#fef2f2':'#f0fdf4',low?'#dc2626':'#16a34a')}</td>
       <td style="display:flex;gap:4px">
         <button class="btn btn-outline btn-sm" onclick="openQuickStok('${p.id}')" title="Shto Stok">➕</button>
