@@ -724,7 +724,7 @@ function showFatureByFat(fat){
         name = s.name || 'Servis';
         nje = s.nje || 'Pune';
       }
-      return {name:name,kodi:s.prod,nje:nje,sasia:s.sasia,cm:cm,total:s.sasia*cm,garancia:s.garancia||''};
+      return {name:name,kodi:s.prod,nje:nje,sasia:s.sasia,cm:cm,total:s.sasia*cm,garancia:s.garancia?garanciaLabel(s):''};
     });
     const grossTotal=items.reduce((s,i)=>s+i.total,0);
     const tvsh = meta.tvshOpt === 'po' ? grossTotal * 0.2 : 0;
