@@ -192,7 +192,7 @@
         </div>
         <div style="background:#f8fafc;border-radius:10px;padding:1rem;margin-bottom:1rem;border:1px solid var(--border)">
           <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text2);margin-bottom:.75rem">➕ Shto Artikull</div>
-          <div class="dash-form-grid" style="display:grid;grid-template-columns:2fr 1.4fr 1fr auto;gap:.5rem;align-items:end">
+          <div class="dash-form-grid" style="display:grid;grid-template-columns:1.8fr 1.2fr 1fr 1fr auto;gap:.5rem;align-items:end">
             <div class="form-group" style="margin:0;position:relative">
               <label>Produkti</label>
               <input id="ds-prod-search" autocomplete="off" placeholder="🔍 Kërko produkt..." oninput="dsProdSearchInput(this.value)" style="background:#fff;border:1.5px solid var(--border);border-radius:9px;padding:9px 12px;color:var(--text);font-size:13px;font-family:'Inter',sans-serif;width:100%;outline:none">
@@ -209,6 +209,13 @@
               </div>
             </div>
             <div class="form-group" style="margin:0">
+              <label>Garancia (opsionale)</label>
+              <div style="display:flex;gap:4px">
+                <input id="ds-gar-val" type="number" placeholder="p.sh. 6" min="0" style="width:56px;flex-shrink:0">
+                <select id="ds-gar-nje" style="flex:1;background:#fff;border:1.5px solid var(--border);border-radius:9px;padding:9px 6px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text);outline:none"><option value="muaj">Muaj</option><option value="vite">Vite</option></select>
+              </div>
+            </div>
+            <div class="form-group" style="margin:0">
               <label>Çmimi Shitjes (L)</label>
               <div class="ptype-row">
                 <button type="button" class="ptype-btn active" data-type="1" onclick="dsSetPriceType('1')">Çmimi 1</button>
@@ -218,11 +225,6 @@
               <input id="ds-cms" type="number" placeholder="0" onkeydown="if(event.key==='Enter')dsCartAdd()">
             </div>
             <button class="btn btn-primary btn-sm" style="margin-bottom:1px" onclick="dsCartAdd()">➕ Shto</button>
-          </div>
-          <div style="display:flex;gap:6px;align-items:center;margin-top:.5rem">
-            <label style="font-size:11px;color:var(--text2);white-space:nowrap">Garancia (opsionale):</label>
-            <input id="ds-gar-val" type="number" placeholder="p.sh. 6" min="0" style="width:80px">
-            <select id="ds-gar-nje" style="width:100px"><option value="muaj">Muaj</option><option value="vite">Vite</option></select>
           </div>
         </div>
         <div style="background:#fff;border-radius:10px;border:1px solid var(--border);overflow:hidden;margin-bottom:1rem">
@@ -960,7 +962,7 @@
     </div>
     <div style="background:#f8fafc;border-radius:10px;padding:1rem;margin-bottom:1rem;border:1px solid var(--border)">
       <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text2);margin-bottom:.75rem">➕ Shto Artikull</div>
-      <div style="display:grid;grid-template-columns:2fr 1.4fr 1fr auto;gap:.5rem;align-items:end">
+      <div style="display:grid;grid-template-columns:1.8fr 1.2fr 1fr 1fr auto;gap:.5rem;align-items:end">
         <div class="form-group" style="margin:0;position:relative">
           <label>Produkti</label>
           <input id="s-prod-search" autocomplete="off" placeholder="🔍 Kërko produkt..." oninput="prodSearchInput(this.value)" style="background:#fff;border:1.5px solid var(--border);border-radius:9px;padding:9px 12px;color:var(--text);font-size:13px;font-family:'Inter',sans-serif;width:100%;outline:none">
@@ -977,6 +979,13 @@
           </div>
         </div>
         <div class="form-group" style="margin:0">
+          <label>Garancia (opsionale)</label>
+          <div style="display:flex;gap:4px">
+            <input id="s-gar-val" type="number" placeholder="p.sh. 6" min="0" style="width:56px;flex-shrink:0">
+            <select id="s-gar-nje" style="flex:1;background:#fff;border:1.5px solid var(--border);border-radius:9px;padding:9px 6px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text);outline:none"><option value="muaj">Muaj</option><option value="vite">Vite</option></select>
+          </div>
+        </div>
+        <div class="form-group" style="margin:0">
           <label>Çmimi Shitjes (L)</label>
           <div class="ptype-row">
             <button type="button" class="ptype-btn active" data-type="1" onclick="setPriceType('1')">Çmimi 1</button>
@@ -986,11 +995,6 @@
           <input id="s-cms" type="number" placeholder="0" onkeydown="if(event.key==='Enter')cartAdd()">
         </div>
         <button class="btn btn-primary btn-sm" style="margin-bottom:1px" onclick="cartAdd()">➕ Shto</button>
-      </div>
-      <div style="display:flex;gap:6px;align-items:center;margin-top:.5rem">
-        <label style="font-size:11px;color:var(--text2);white-space:nowrap">Garancia (opsionale):</label>
-        <input id="s-gar-val" type="number" placeholder="p.sh. 6" min="0" style="width:80px">
-        <select id="s-gar-nje" style="width:100px"><option value="muaj">Muaj</option><option value="vite">Vite</option></select>
       </div>
     </div>
     <div style="background:#fff;border-radius:10px;border:1px solid var(--border);overflow:hidden;margin-bottom:1rem">
