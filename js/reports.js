@@ -724,7 +724,7 @@ function showFatureByFat(fat){
         name = s.name || 'Servis';
         nje = s.nje || 'Pune';
       }
-      return {name:name,kodi:s.prod,nje:nje,sasia:s.sasia,cm:cm,total:s.sasia*cm};
+      return {name:name,kodi:s.prod,nje:nje,sasia:s.sasia,cm:cm,total:s.sasia*cm,garancia:s.garancia||''};
     });
     const grossTotal=items.reduce((s,i)=>s+i.total,0);
     const tvsh = meta.tvshOpt === 'po' ? grossTotal * 0.2 : 0;
@@ -799,6 +799,7 @@ function buildFatureHTML(d){
       <td style="padding:13px 0;font-size:13px;color:#374151;border-bottom:1px solid #f1f5f9;vertical-align:top">
         <div style="font-weight:600;color:#111827;font-size:13.5px">${it.name}</div>
         ${it.kodi?`<div style="font-size:11px;color:#9ca3af;margin-top:2px">${it.kodi}</div>`:''}
+        ${it.garancia?`<div style="font-size:11px;color:#16a34a;margin-top:2px">🛡️ Garancia: ${it.garancia}</div>`:''}
       </td>
       <td style="padding:13px 12px;text-align:center;font-size:12px;color:#6b7280;border-bottom:1px solid #f1f5f9;vertical-align:top">${it.nje}</td>
       <td style="padding:13px 12px;text-align:center;font-weight:700;font-size:13px;color:#111827;border-bottom:1px solid #f1f5f9;vertical-align:top">${it.sasia}</td>
@@ -1035,6 +1036,7 @@ function printPOS80(){
   const curr = d.valuta || 'ALL';
   const rows=d.items.map(it=>
     `<div style="margin-bottom:6px"><div style="font-weight:700">${it.name}</div>
+     ${it.garancia?`<div style="font-size:11px">🛡️ Garancia: ${it.garancia}</div>`:''}
      <div style="display:flex;justify-content:space-between"><span>${it.sasia} ${it.nje} x ${fmtModal(it.cm, curr)}</span><span style="font-weight:700">${fmtModal(it.total, curr)}</span></div></div>`
   ).join('');
   const statusTxt={paguar:'✓ PAGUAR',papaguar:'✗ PA PAGUAR',pjeserisht:'◑ PJESËRISHT',preventiv:'📝 PREVENTIV'};
@@ -1126,7 +1128,7 @@ function exportPDF(){
   }
 
   // TABELA ARTIKUJVE
-  doc.autoTable({startY:62,head:[['#','Artikulli','Njësia','Sasia','Çmimi','Totali']],body:d.items.map((it,i)=>[String(i+1),it.name,it.nje,String(it.sasia),fmtModal(it.cm,curr),fmtModal(it.total,curr)]),theme:'plain',headStyles:{fillColor:[17,24,39],textColor:255,fontSize:9,fontStyle:'bold',lineWidth:0},columnStyles:{0:{halign:'center',cellWidth:10},2:{halign:'center',cellWidth:18},3:{halign:'center',cellWidth:16},4:{halign:'right',cellWidth:30},5:{halign:'right',cellWidth:30}},styles:{fontSize:10,cellPadding:4,lineColor:[241,245,249],lineWidth:0.3},alternateRowStyles:{fillColor:[248,250,252]}});
+  doc.autoTable({startY:62,head:[['#','Artikulli','Njësia','Sasia','Çmimi','Totali']],body:d.items.map((it,i)=>[String(i+1),it.garancia?`${it.name}\nGarancia: ${it.garancia}`:it.name,it.nje,String(it.sasia),fmtModal(it.cm,curr),fmtModal(it.total,curr)]),theme:'plain',headStyles:{fillColor:[17,24,39],textColor:255,fontSize:9,fontStyle:'bold',lineWidth:0},columnStyles:{0:{halign:'center',cellWidth:10},2:{halign:'center',cellWidth:18},3:{halign:'center',cellWidth:16},4:{halign:'right',cellWidth:30},5:{halign:'right',cellWidth:30}},styles:{fontSize:10,cellPadding:4,lineColor:[241,245,249],lineWidth:0.3},alternateRowStyles:{fillColor:[248,250,252]}});
 
   // TOTALET
   const fy=doc.lastAutoTable.finalY+8;const bx=pw-80;
