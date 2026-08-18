@@ -31,6 +31,12 @@ async function sbLoad(){
       const saved = localStorage.getItem('tp_users');
       if(saved) users = JSON.parse(saved);
     }
+    // 🔧 Siguro që admin lokal (admin/admin123) mbetet gjithmonë i disponueshëm,
+    // edhe nëse Supabase ktheu një listë përdoruesish që nuk e përfshin.
+    // Përndryshe sesioni lokal humbet (logout) në çdo refresh të faqes.
+    if(!users.find(u=>u.username==='admin')){
+      users.unshift({username:'admin',password:'admin123',role:'admin'});
+    }
     if(p.data?.length) products = p.data;
     if(bl.data?.length) blerjet = bl.data.map(b=>({...b,cmb:Number(b.cmb),sasia:Number(b.sasia)}));
     if(sh.data?.length) shitjet = sh.data.map(s=>({...s,cms:Number(s.cms),sasia:Number(s.sasia),borxh:Number(s.borxh||0),ts:s.ts?Number(s.ts):null}));
@@ -164,10 +170,10 @@ async function checkSession() {
     const saved = sessionStorage.getItem('tp_local_session');
     if (saved) {
       const s = JSON.parse(saved);
-      const userOk = users.find(u => u.username === s.user && u.role === s.role);
+      const userOk = users.find(u => u.username === s.user);
       if (userOk) {
-        currentUser = s.user;
-        currentRole = s.role;
+        currentUser = userOk.username;
+        currentRole = userOk.role || s.role;
         document.getElementById('login-screen').style.display = 'none';
         const app = document.getElementById('app-wrapper');
         app.style.display = 'flex';
@@ -180,6 +186,7 @@ async function checkSession() {
         autoBackupCheck();
         return;
       } else {
+        console.warn('⚠ Sesioni lokal u gjet (', s.user, ') por nuk u gjet më te "users" pas ngarkimit nga Supabase — po bëhet logout. Përdoruesit e ngarkuar:', users.map(u=>u.username));
         sessionStorage.removeItem('tp_local_session');
       }
     }
