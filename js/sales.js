@@ -646,6 +646,7 @@ function dsProdSearchInput(q){
 }
 
 function dsCartAdd(){
+  try{
   const prodId=document.getElementById('ds-prod').value;
   const sasia=+document.getElementById('ds-sasia').value;
   const nje=document.getElementById('ds-nje').value;
@@ -673,6 +674,10 @@ function dsCartAdd(){
   dsRenderCart();
   const srch = document.getElementById('ds-prod-search');
   if(srch) srch.focus();
+  }catch(e){
+    console.error('⚠ dsCartAdd() gabim:', e);
+    alert('⚠ Ndodhi një gabim gjatë shtimit të produktit: '+(e.message||e)+'\nHap konsolën e shfletuesit (F12) dhe më dërgo mesazhin e plotë.');
+  }
 }
 
 function dsCartRemove(i){dsCart.splice(i,1);dsRenderCart();}
@@ -687,14 +692,20 @@ function dsRenderCart(){
     return;
   }
   el.innerHTML=`<table style="font-size:13px"><thead><tr>${['Produkti','Sasia','Çmimi','Garancia','Totali',''].map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>
-    ${dsCart.map((c,i)=>`<tr>
+    ${dsCart.map((c,i)=>{
+      try{
+        let garLabel='—';
+        try{ if(c.garancia) garLabel = garanciaLabel(c) || '—'; }catch(ge){ console.warn('⚠ Gabim te garanciaLabel në ds-cart:', ge, c); }
+        return `<tr>
       <td style="font-weight:600;color:var(--text)">${c.name}<br><span class="mono">${c.prodId}</span></td>
       <td style="text-align:center">${c.sasia} ${c.nje}</td>
       <td style="text-align:right">${fmtModal(c.cms, curr)}</td>
-      <td style="text-align:center;color:var(--text3)">${(c.garancia && garanciaLabel(c))||'—'}</td>
+      <td style="text-align:center;color:var(--text3)">${garLabel}</td>
       <td style="text-align:right;font-weight:700;color:var(--accent)">${fmtModal(c.total, curr)}</td>
       <td><button class="btn btn-danger btn-sm" onclick="dsCartRemove(${i})">✕</button></td>
-    </tr>`).join('')}
+    </tr>`;
+      }catch(e){ console.warn('⚠ Gabim në dsRenderCart për artikullin:', c, e); return ''; }
+    }).join('')}
   </tbody></table>`;
   const grossTotal=dsCart.reduce((s,c)=>s+c.total,0);
   const tvshOpt=document.getElementById('ds-tvsh-opt').value;
@@ -799,7 +810,8 @@ async function dsAddShitje() {
         nje: c.nje,
         sasia: c.sasia,
         cm: c.cms,
-        total: c.total
+        total: c.total,
+        garancia: c.garancia ? garanciaLabel(c) : ''
     }));
     const grossSnap = items.reduce((s, i) => s + i.total, 0);
     const tvshSnap = (tvshOpt === 'po') ? grossSnap * 0.2 : 0;
@@ -892,6 +904,7 @@ function servisAdd() {
 }
 
 function cartAdd(){
+  try{
   const prodId=document.getElementById('s-prod').value;
   const sasia=+document.getElementById('s-sasia').value;
   const nje=document.getElementById('s-nje').value;
@@ -919,6 +932,10 @@ function cartAdd(){
   renderCart();
   const srch2 = document.getElementById('s-prod-search');
   if(srch2) srch2.focus();
+  }catch(e){
+    console.error('⚠ cartAdd() gabim:', e);
+    alert('⚠ Ndodhi një gabim gjatë shtimit të produktit: '+(e.message||e)+'\nHap konsolën e shfletuesit (F12) dhe më dërgo mesazhin e plotë.');
+  }
 }
 
 function cartRemove(i){cart.splice(i,1);renderCart();}
@@ -933,14 +950,20 @@ function renderCart(){
     return;
   }
   el.innerHTML=`<table style="font-size:13px"><thead><tr>${['Produkti','Sasia','Çmimi','Garancia','Totali',''].map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>
-    ${cart.map((c,i)=>`<tr>
+    ${cart.map((c,i)=>{
+      try{
+        let garLabel='—';
+        try{ if(c.garancia) garLabel = garanciaLabel(c) || '—'; }catch(ge){ console.warn('⚠ Gabim te garanciaLabel në cart:', ge, c); }
+        return `<tr>
       <td style="font-weight:600;color:var(--text)">${c.name}<br><span class="mono">${c.prodId}</span></td>
       <td style="text-align:center">${c.sasia} ${c.nje}</td>
       <td style="text-align:right">${fmtModal(c.cms, curr)}</td>
-      <td style="text-align:center;color:var(--text3)">${(c.garancia && garanciaLabel(c))||'—'}</td>
+      <td style="text-align:center;color:var(--text3)">${garLabel}</td>
       <td style="text-align:right;font-weight:700;color:var(--accent)">${fmtModal(c.total, curr)}</td>
       <td><button class="btn btn-danger btn-sm" onclick="cartRemove(${i})">✕</button></td>
-    </tr>`).join('')}
+    </tr>`;
+      }catch(e){ console.warn('⚠ Gabim në renderCart për artikullin:', c, e); return ''; }
+    }).join('')}
   </tbody></table>`;
   const grossTotal=cart.reduce((s,c)=>s+c.total,0);
   const tvshOpt = document.getElementById('s-tvsh-opt').value;
@@ -1045,7 +1068,8 @@ async function addShitje() {
         nje: c.nje,
         sasia: c.sasia,
         cm: c.cms,
-        total: c.total
+        total: c.total,
+        garancia: c.garancia ? garanciaLabel(c) : ''
     }));
     const grossSnap = items.reduce((s, i) => s + i.total, 0);
     const tvshSnap = (tvshOpt === 'po') ? grossSnap * 0.2 : 0;
