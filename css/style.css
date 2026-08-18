@@ -530,3 +530,17 @@ select option{background:#fff}
   .fature-wrapper{max-width:100%!important}
   .fature-footer [style*="justify-content:space-between"]{flex-direction:column!important;gap:4px!important}
 }
+
+/* ── Rreshti uniform "Shto Artikull": Sasia + Njesia (me ngushte) + Cmimi + Garancia ── */
+.artikull-row{
+  display:grid;
+  grid-template-columns: 1fr 0.7fr 1fr 1fr;
+  gap:1rem;
+  margin-bottom:1.25rem;
+}
+
+@media (max-width:640px){
+  .artikull-row{
+    grid-template-columns: 1fr 1fr;
+  }
+}
