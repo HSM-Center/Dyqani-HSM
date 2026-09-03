@@ -113,13 +113,6 @@ const MODALS=[null,"modal-addprod","modal-addblerje","modal-addshitje",null,null
 let currentView = 'list';
 let mainChart=null, donutChart=null;
 
-// 🔒 Numëron sa ruajtje drejt Supabase janë ende në progres.
-// _checkAppVersion e përdor këtë për të MOS rifreskuar faqen ndërkohë
-// që një shitje/blerje etj. është duke u dërguar te cloud-i — përndryshe
-// reload-i e ndërpret dërgimin dhe sbLoad() pas rifreskimit e mbishkruan
-// të dhënën e re lokale me versionin e vjetër nga cloud (shitja "zhduket").
-let _pendingCloudSaves = 0;
-
 function save(){
   localStorage.setItem('tp_products',JSON.stringify(products));
   localStorage.setItem('tp_blerjet',JSON.stringify(blerjet));
@@ -129,11 +122,7 @@ function save(){
   localStorage.setItem('tp_users',JSON.stringify(users));
   localStorage.setItem('tp_xhiro_historiku', JSON.stringify(xhiroHistoriku));
   localStorage.setItem('tp_arketimet', JSON.stringify(arketimet));
-  _pendingCloudSaves++;
-  Promise.resolve()
-    .then(() => sbSave())
-    .catch(e => console.warn('⚠ sbSave dështoi:', e))
-    .finally(() => { _pendingCloudSaves = Math.max(0, _pendingCloudSaves - 1); });
+  sbSave();
 }
 
 function today(){
@@ -1022,16 +1011,10 @@ async function _checkAppVersion(){
       return;
     }
     if(v !== _lastKnownAppVersion){
-      if(_pendingCloudSaves > 0){
-        // Ka ende ruajtje (shitje/blerje/etj.) drejt Supabase në progres —
-        // MOS rifresko tani, sepse do ta ndërpresësh dërgimin dhe do humbësh
-        // të dhënën. Riprovo pas 3 sekondash.
-        setTimeout(_checkAppVersion, 3000);
-        return;
-      }
       location.reload(); // versioni ndryshoi -> rifresko automatikisht
     }
   }catch(e){ /* injoro gabimet e rrjetit */ }
 }
 _checkAppVersion();
 setInterval(_checkAppVersion, 60000);
+
