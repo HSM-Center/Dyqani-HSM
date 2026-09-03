@@ -72,36 +72,19 @@ async function sbSave(){
     shitjet = dedupeById(shitjet,'id');
     blerjet = dedupeById(blerjet,'id');
     shpenzimet = dedupeById(shpenzimet,'id');
-    // Merge shitjet, blerjet, shpenzimet IDs currently in memory
-    const shitjetIds = shitjet.map(s=>s.id).filter(Boolean);
-    const blerjetIds = blerjet.map(b=>b.id).filter(Boolean);
-    const shpenzimetIds = shpenzimet.map(s=>s.id).filter(Boolean);
     const fatMetaFats = Object.keys(faturatMeta);
 
-    // Delete rows from Supabase that no longer exist in memory.
-    // E RËNDËSISHME: nëse lista lokale është bosh (0 rreshta), NUK fshijmë gjithçka
-    // te Supabase — thjesht anashkalojmë fshirjen për këtë tabelë. Fshirja e plotë
-    // e një tabele bazuar vetëm te një gjendje kalimtare lokale bosh ishte shumë e rrezikshme.
-    const delOps = [];
-    const delLabels = [];
-    if(shitjetIds.length > 0){
-      delOps.push(sb.from('shitjet').delete().not('id','in','('+shitjetIds.map(x=>`"${x}"`).join(',')+')'));
-      delLabels.push('shitjet(del)');
-    }
-    if(blerjetIds.length > 0){
-      delOps.push(sb.from('blerjet').delete().not('id','in','('+blerjetIds.map(x=>`"${x}"`).join(',')+')'));
-      delLabels.push('blerjet(del)');
-    }
-    if(shpenzimetIds.length > 0){
-      delOps.push(sb.from('shpenzimet').delete().not('id','in','('+shpenzimetIds.map(x=>`"${x}"`).join(',')+')'));
-      delLabels.push('shpenzimet(del)');
-    }
-    if(fatMetaFats.length > 0){
-      delOps.push(sb.from('faturat_meta').delete().not('fat','in','('+fatMetaFats.map(x=>`"${x}"`).join(',')+')'));
-      delLabels.push('faturat_meta(del)');
-    }
-    const delResults = await Promise.allSettled(delOps);
-    delResults.forEach((r,i)=>{ if(r.status==='rejected' || r.value?.error) console.warn('⚠ Supabase DELETE dështoi te', delLabels[i], ':', r.reason||r.value.error); });
+    // ⚠ SHËNIM SIGURIE (rregulluar): më parë këtu fshiheshin nga Supabase të gjitha
+    // rreshtat që "nuk gjendeshin" në listën lokale në memorie të kësaj skede/pajisje.
+    // Kjo ishte E RREZIKSHME: nëse kjo skedë/pajisje kishte një kopje TË VJETËR në
+    // memorie (p.sh. skedë e hapur nga më parë, pa u rifreskuar, ndërkohë që një
+    // pajisje tjetër kishte shtuar fatura të reja), çdo ruajtje nga këtu fshinte
+    // përgjithmonë nga cloud-i faturat "e panjohura" për të — pavarësisht se ishin
+    // krejt të vlefshme. Fshirjet reale bëhen tashmë në mënyrë eksplicite dhe të
+    // sigurt te vetë veprimet e fshirjes (deleteShitje, deleteShpenzim,
+    // fshiTeGjithaFaturatAdmin, etj.), kështu që nuk nevojitet fare një "fshirje
+    // sinkronizimi" e përgjithshme këtu. sbSave() tani VETËM shton/përditëson
+    // (upsert), asnjëherë nuk fshin masivisht.
 
     // Upsert current data
     const upsertLabels = ['products','users','biz_cfg'];
@@ -465,4 +448,3 @@ async function doLogin() {
 
 // Register real implementations for early stubs
 _doLoginReal = doLogin;
-
