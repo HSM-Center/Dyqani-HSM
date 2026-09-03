@@ -1,12 +1,3 @@
-// 🧹 Pastrim një-herësh i localStorage (rregullon çelësa të vjetër/të korruptuar
-// që bllokonin ruajtjen e faturave/shitjeve). Ekzekutohet vetëm 1 herë te çdo
-// browser; pas kësaj rifreskon faqen që të tërheqë gjithçka fresh nga Supabase.
-if (!localStorage.getItem('tp_cleanup_20260903')) {
-  localStorage.clear();
-  localStorage.setItem('tp_cleanup_20260903', '1');
-  location.reload();
-}
-
 const SUPA_URL = 'https://sfcabrvvnvbnccbwnfvi.supabase.co';
 const SUPA_KEY = 'sb_publishable_aI6cQDd_9bjXfQ4HRwbiZw_POPTOZlV';
 const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
@@ -65,7 +56,18 @@ async function sbLoad(){
   } catch(e){ console.warn('⚠ Supabase load error:', e); }
 }
 
-async function sbSave(){
+// Radhë (queue) që siguron që sbSave() të mos ekzekutohet kurrë paralelisht.
+// Pa këtë, dy thirrje sbSave() njëra pas tjetrës mund të nisen NJËKOHËSISHT:
+// e para (më e ngadaltë, ende me "foton" e vjetër të ID-ve) mund të fshijë
+// nga Supabase një rresht që i dyti (më i shpejtë) sapo e ka shtuar —
+// pra një shitje/blerje/produkt i ri "zhduket" nga cloud-i pak sekonda pasi u ruajt.
+let _sbSaveQueue = Promise.resolve();
+function sbSave(){
+  _sbSaveQueue = _sbSaveQueue.then(() => _sbSaveReal());
+  return _sbSaveQueue;
+}
+
+async function _sbSaveReal(){
   _sbPending++;
   // Nëse ka dy a më shumë rreshta me të njëjtin ID, Supabase e refuzon TË GJITHË
   // upsert-in (jo vetëm rreshtin problematik). E pastrojmë këtu, duke mbajtur
