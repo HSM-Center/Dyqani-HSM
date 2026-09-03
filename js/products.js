@@ -691,4 +691,3 @@ async function deleteBlerjeFat(fat){
     }catch(e){ console.warn('⚠ Supabase delete (blerje fat) error:',e); }
   }
 }
-
