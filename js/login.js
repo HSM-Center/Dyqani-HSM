@@ -56,18 +56,7 @@ async function sbLoad(){
   } catch(e){ console.warn('⚠ Supabase load error:', e); }
 }
 
-// Radhë (queue) që siguron që sbSave() të mos ekzekutohet kurrë paralelisht.
-// Pa këtë, dy thirrje sbSave() njëra pas tjetrës mund të nisen NJËKOHËSISHT:
-// e para (më e ngadaltë, ende me "foton" e vjetër të ID-ve) mund të fshijë
-// nga Supabase një rresht që i dyti (më i shpejtë) sapo e ka shtuar —
-// pra një shitje/blerje/produkt i ri "zhduket" nga cloud-i pak sekonda pasi u ruajt.
-let _sbSaveQueue = Promise.resolve();
-function sbSave(){
-  _sbSaveQueue = _sbSaveQueue.then(() => _sbSaveReal());
-  return _sbSaveQueue;
-}
-
-async function _sbSaveReal(){
+async function sbSave(){
   _sbPending++;
   // Nëse ka dy a më shumë rreshta me të njëjtin ID, Supabase e refuzon TË GJITHË
   // upsert-in (jo vetëm rreshtin problematik). E pastrojmë këtu, duke mbajtur
@@ -476,3 +465,4 @@ async function doLogin() {
 
 // Register real implementations for early stubs
 _doLoginReal = doLogin;
+
