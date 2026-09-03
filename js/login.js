@@ -1,3 +1,12 @@
+// 🧹 Pastrim një-herësh i localStorage (rregullon çelësa të vjetër/të korruptuar
+// që bllokonin ruajtjen e faturave/shitjeve). Ekzekutohet vetëm 1 herë te çdo
+// browser; pas kësaj rifreskon faqen që të tërheqë gjithçka fresh nga Supabase.
+if (!localStorage.getItem('tp_cleanup_20260903')) {
+  localStorage.clear();
+  localStorage.setItem('tp_cleanup_20260903', '1');
+  location.reload();
+}
+
 const SUPA_URL = 'https://sfcabrvvnvbnccbwnfvi.supabase.co';
 const SUPA_KEY = 'sb_publishable_aI6cQDd_9bjXfQ4HRwbiZw_POPTOZlV';
 const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
@@ -465,4 +474,3 @@ async function doLogin() {
 
 // Register real implementations for early stubs
 _doLoginReal = doLogin;
-
