@@ -1197,3 +1197,4 @@ function exportPDF(){
   doc.text((bizCfg.footer||'Faleminderit për bashkëpunimin!')+' · '+bizCfg.emri, pw/2, ph-6, {align:'center'});
   doc.save((isPrev?'Preventiv-':'Fatura-')+d.fat+'.pdf');
 }
+
